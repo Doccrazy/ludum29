@@ -1,0 +1,8 @@
+syntax: glob
+.gradle
+.settings
+.project
+.classpath
+bin
+build
+local.properties

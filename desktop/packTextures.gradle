@@ -1,0 +1,22 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        mavenLocal()
+    }
+    dependencies {
+        classpath "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
+    }
+}
+
+task packTextures() << {
+    def settings = {
+        filterMag = 'Linear'
+        filterMin = 'MipMapLinearLinear'
+        wrapX = 'Repeat'
+        wrapY = 'Repeat'
+    } as com.badlogic.gdx.tools.texturepacker.TexturePacker.Settings
+    com.badlogic.gdx.tools.texturepacker.TexturePacker.processIfModified(
+            settings, project.assetsSrcDir.path, sourceSets.main.output.resourcesDir.path, 'game.atlas')
+}
+processResources.dependsOn packTextures
