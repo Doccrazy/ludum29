@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 
 import de.doccrazy.ld29.core.Resource;
 import de.doccrazy.ld29.game.GameWorld;
+import de.doccrazy.ld29.game.base.RegularAction;
 import de.doccrazy.ld29.game.level.Level;
 import de.doccrazy.ld29.game.level.TileType;
 
@@ -28,38 +29,52 @@ public class LevelActor extends Actor {
         this.level = level;
         world.stage.addActor(this);
         initBodies();
+        addAction(new UpdateTilesAction());
     }
 
     private void initBodies() {
         for (Entry<Point, TileType> entry : level.getMap().entrySet()) {
-            Point pos = entry.getKey();
-            BodyDef tileBodyDef = new BodyDef();
-            // Set its world position
-            tileBodyDef.position.set(new Vector2(pos.x, pos.y));
-
-            Body body = world.box2dWorld.createBody(tileBodyDef);
-            body.setUserData(this);
-
-            // Create a polygon shape
-            PolygonShape groundBox = new PolygonShape();
-            // Set the polygon shape as a box which is twice the size of our view port and 20 high
-            // (setAsBox takes half-width and half-height as arguments)
-            groundBox.setAsBox(1, 1);
-            // Create a fixture from our polygon shape and add it to our ground body
-            body.createFixture(groundBox, 0.0f);
-            // Clean up after ourselves
-            groundBox.dispose();
-
-            bodies.put(pos, body);
+            createBodyForTile(entry.getKey(), entry.getValue());
         }
     }
 
-    public void clearTile(int x, int y) {
-        level.clear(x, y);
-        Point key = level.mapKey(x, y);
-        if (bodies.containsKey(key)) {
-            world.box2dWorld.destroyBody(bodies.get(key));
-            bodies.remove(key);
+    void createBodyForTile(Point pos, TileType value) {
+        BodyDef tileBodyDef = new BodyDef();
+        // Set its world position
+        tileBodyDef.position.set(new Vector2(pos.x + 0.5f, pos.y + 0.5f));
+
+        Body body = world.box2dWorld.createBody(tileBodyDef);
+        body.setUserData(this);
+
+        // Create a polygon shape
+        PolygonShape groundBox = new PolygonShape();
+        // Set the polygon shape as a box which is twice the size of our view port and 20 high
+        // (setAsBox takes half-width and half-height as arguments)
+        groundBox.setAsBox(0.5f, 0.5f);
+        // Create a fixture from our polygon shape and add it to our ground body
+        body.createFixture(groundBox, 0.0f);
+        // Clean up after ourselves
+        groundBox.dispose();
+
+        bodies.put(pos, body);
+    }
+
+    public void clearTile(Point pos) {
+        level.clear(pos);
+        if (bodies.containsKey(pos)) {
+            world.box2dWorld.destroyBody(bodies.get(pos));
+            bodies.remove(pos);
+        }
+    }
+
+    public void pickaxe(Point pos, float strength) {
+        Float hp = level.healthAt(pos);
+        if (hp != null && hp > 0) {
+            hp = hp - strength;
+            level.put(pos, hp);
+            if (hp <= 0) {
+                clearTile(pos);
+            }
         }
     }
 
@@ -69,12 +84,49 @@ public class LevelActor extends Actor {
             Sprite sprite = Resource.tiles.get(entry.getValue());
             Point point = entry.getKey();
             if (sprite != null) {
-                batch.draw(sprite, point.x + getOriginX(), point.y + getOriginY(),0, 0, 1, 1, 1, 1, 0);
+                batch.draw(sprite, point.x + getOriginX(), point.y + getOriginY(), 0, 0, 1, 1, 1, 1, 0);
             }
         }
     }
 
     public Level getLevel() {
         return level;
+    }
+}
+
+class UpdateTilesAction extends RegularAction {
+    private Level level;
+
+    public UpdateTilesAction() {
+        super(1f);
+    }
+
+    @Override
+    public void setActor(Actor actor) {
+        super.setActor(actor);
+        if (actor != null) {
+            this.level = ((LevelActor)actor).getLevel();
+        }
+    }
+
+    @Override
+    protected boolean run(float delta) {
+        update();
+        return false;
+    }
+
+    public void update() {
+        LevelActor levelActor = ((LevelActor)actor);
+        HashMap<Point, TileType> oldMap = new HashMap<>(level.getMap());
+        for (Entry<Point, TileType> entry : oldMap.entrySet()) {
+            Point below = new Point(entry.getKey().x, entry.getKey().y - 1);
+            if ((entry.getValue() == TileType.GRAVEL || entry.getValue() == TileType.SAND)
+                    && level.tileAt(below) == null) {
+                level.put(below, entry.getValue());
+                levelActor.createBodyForTile(below, entry.getValue());
+                level.put(below, level.healthAt(entry.getKey()));
+                levelActor.clearTile(entry.getKey());
+            }
+        }
     }
 }

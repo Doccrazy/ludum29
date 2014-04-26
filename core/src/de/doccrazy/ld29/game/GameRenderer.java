@@ -27,6 +27,7 @@ public class GameRenderer implements ActorListener {
     private Box2DDebugRenderer renderer;
     private Vector2 playerPos, cameraPos = new Vector2(-100, 100);
 	private float zoom = 1;
+	private float zoomDelta = 0;
 
     public GameRenderer(GameWorld world) {
         this.world = world;
@@ -66,6 +67,7 @@ public class GameRenderer implements ActorListener {
     }
 
 	private void positionCamera() {
+	    zoom = clip(zoom + zoomDelta*0.02f, 1f, 7f);
 		ExtendViewport vp = (ExtendViewport)world.stage.getViewport();
 		vp.setMinWorldWidth(UNIT_WIDTH*zoom);
 		vp.setMinWorldHeight(UNIT_HEIGHT*zoom);
@@ -95,8 +97,8 @@ public class GameRenderer implements ActorListener {
 	public void actorRemoved(Box2dActor actor) {
 	}
 
-	public void setZoom(float zoom) {
-		this.zoom = zoom;
+	public void setZoomDelta(float zoomDelta) {
+		this.zoomDelta = zoomDelta;
 	}
 
 	public Vector2 toWorldCoordinates(Vector2 s) {

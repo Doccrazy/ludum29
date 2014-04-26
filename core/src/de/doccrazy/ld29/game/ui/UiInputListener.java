@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import de.doccrazy.ld29.core.Debug;
 import de.doccrazy.ld29.game.GameRenderer;
 import de.doccrazy.ld29.game.GameWorld;
+import de.doccrazy.ld29.game.level.Level;
 
 public class UiInputListener extends InputListener {
 	private GameWorld world;
@@ -28,17 +29,32 @@ public class UiInputListener extends InputListener {
 		}
 		if (Debug.ON) {
 			if (keycode == Keys.Z) {
-				renderer.setZoom(7.0f);
+				renderer.setZoomDelta(1f);
 			}
 		}
 		return false;
 	}
 
 	@Override
+	public boolean keyUp(InputEvent event, int keycode) {
+        if (Debug.ON) {
+            if (keycode == Keys.Z) {
+                renderer.setZoomDelta(-2f);
+            }
+        }
+        return false;
+	}
+
+	@Override
 	public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
 	    Vector2 screen = uiStage.stageToScreenCoordinates(new Vector2(x, y));
 	    Vector2 coord = renderer.toWorldCoordinates(screen);
-	    world.getCurrentLevel().clearTile((int)coord.x, (int)coord.y - 1);
+	    if (button == 0) {
+	        world.getCurrentLevel().clearTile(Level.getTileIndex(coord));
+	    }
+	    if (button == 1) {
+	        world.spawnDigger(coord);
+	    }
 	    return false;
 	}
 }

@@ -6,10 +6,47 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.RandomUtils;
+
+import com.badlogic.gdx.math.Vector2;
+
 public class Level {
     private Map<Point, TileType> map = new HashMap<>();
+    private Map<Point, Float> health = new HashMap<>();
     private int width;
     private int height;
+
+    private Map<TileType, Integer> MIN_DEPTH = new HashMap<TileType, Integer>() {{
+        put(TileType.COAL, -2);
+        put(TileType.IRON, -5);
+        put(TileType.SILVER, -8);
+        put(TileType.GOLD, -10);
+        put(TileType.DIAMOND, -17);
+    }};
+    private Map<TileType, Integer> MAX_DEPTH = new HashMap<TileType, Integer>() {{
+        put(TileType.COAL, -5);
+        put(TileType.IRON, -12);
+        put(TileType.SILVER, -12);
+        put(TileType.GOLD, -15);
+        put(TileType.DIAMOND, -22);
+    }};
+    private Map<TileType, Integer> INIT_HEALTH = new HashMap<TileType, Integer>() {{
+        put(TileType.GRASS, 1);
+        put(TileType.DIRT, 1);
+        put(TileType.ROCK, 2);
+        put(TileType.GRAVEL, 1);
+        put(TileType.SAND, 1);
+        put(TileType.OBSIDIAN, 20);
+        put(TileType.COAL, 2);
+        put(TileType.IRON, 3);
+        put(TileType.SILVER, 4);
+        put(TileType.GOLD, 5);
+        put(TileType.DIAMOND, 8);
+        put(TileType.WATER, 9999);
+        put(TileType.LAVA, 9999);
+    }};
+    private TileType[] ORES = {TileType.COAL, TileType.IRON, TileType.SILVER, TileType.GOLD, TileType.DIAMOND};
 
     private Point lookupKey = new Point();
 
@@ -27,17 +64,29 @@ public class Level {
     }
 
     public TileType tileAt(int x, int y) {
-        return map.get(mapKey(x, y));
+        return tileAt(mapKey(x, y));
     }
 
-    public void put(int x, int y, TileType type) {
-        Point key = new Point(x, y);
-        map.put(key, type);
+    public TileType tileAt(Point pos) {
+        return map.get(pos);
     }
 
-    public void clear(int x, int y) {
-        Point key = new Point(x, y);
-        map.remove(key);
+    public Float healthAt(Point pos) {
+        return health.get(pos);
+    }
+
+    public void put(Point pos, TileType type) {
+        map.put(pos, type);
+        health.put(pos, Float.valueOf(INIT_HEALTH.get(type)));
+    }
+
+    public void put(Point pos, Float hp) {
+        health.put(pos, hp);
+    }
+
+    public void clear(Point pos) {
+        map.remove(pos);
+        health.remove(pos);
     }
 
     public Map<Point, TileType> getMap() {
@@ -52,10 +101,52 @@ public class Level {
 
     public void random() {
         map.clear();
+        health.clear();
         for (int x = 0; x < width; x++) {
             for (int y = 0; y > -height; y--) {
-                put(x, y, pick(x, y));
+                put(new Point(x, y), pick(x, y));
             }
+        }
+        int size = 10;
+        for (TileType type : ORES) {
+            for (int i = 0; i < 2; i++) {
+                placeOre(type, size);
+            }
+            size--;
+        }
+    }
+
+    private void placeOre(TileType type, int size) {
+        Point pos = null;
+        while (pos == null || ArrayUtils.contains(ORES, tileAt(pos))) {
+            int y = (int) (MIN_DEPTH.get(type) + Math.random() * (MAX_DEPTH.get(type) - MIN_DEPTH.get(type)));
+            pos = new Point((int) (Math.random() * width), y);
+        }
+        put(pos, type);
+        extend(pos, size, -1);
+    }
+
+    private void extend(Point pos, int size, int nope) {
+        TileType type = tileAt(pos);
+        Point n = pos;
+        int tries = 10;
+        int r = -1;
+        while (tileAt(n) == type) {
+            r = RandomUtils.nextInt(0, 3);
+            if (r == nope) {
+                continue;
+            }
+            int x = r == 0 ? -1 : (r == 1 ? 1 : 0);
+            int y = r == 2 ? -1 : 0;
+            n = new Point(pos.x + x, pos.y + y);
+            tries--;
+            if (tries == 0) {
+                return;
+            }
+        }
+        put(n, type);
+        if (size > 1) {
+            extend(n, size-1, r);
         }
     }
 
@@ -102,4 +193,13 @@ public class Level {
         }
         return result;
     }
+
+    public static Point getTileIndex(Vector2 coord) {
+        return getTileIndex(coord.x, coord.y);
+    }
+
+    public static Point getTileIndex(float x, float y) {
+        return new Point((int)Math.floor(x), (int)Math.floor(y));
+    }
+
 }

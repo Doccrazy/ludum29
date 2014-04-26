@@ -10,6 +10,8 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
+import de.doccrazy.ld29.game.actor.DiggerAIAction;
+import de.doccrazy.ld29.game.actor.DiggerActor;
 import de.doccrazy.ld29.game.actor.LevelActor;
 import de.doccrazy.ld29.game.base.ActorContactListener;
 import de.doccrazy.ld29.game.base.ActorListener;
@@ -57,6 +59,11 @@ public class GameWorld {
         level.random();
         currentLevel = new LevelActor(this, level);
         currentLevel.setOrigin(0, 0);
+    }
+
+    public void spawnDigger(Vector2 pos) {
+        DiggerActor digger = new DiggerActor(this, pos);
+        digger.addAction(new DiggerAIAction(this));
     }
 
     public void update(float delta) {
