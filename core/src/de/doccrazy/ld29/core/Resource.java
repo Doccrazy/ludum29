@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.utils.Array;
 
+import de.doccrazy.ld29.game.actor.Mood;
 import de.doccrazy.ld29.game.level.TileType;
 
 public class Resource {
@@ -20,6 +21,8 @@ public class Resource {
 	public static Map<TileType, Sprite> tiles = new HashMap<>();
 	public static Sprite digger;
 	public static Array<AtlasRegion> loot;
+	public static Sprite thoughtBubble;
+	public static Map<Mood, Sprite> moods = new HashMap<>();
 
 	private Resource() {
 	}
@@ -49,6 +52,10 @@ public class Resource {
 
         digger = colorSprite(Color.RED, 16, 32);
         loot = atlasGame.findRegions("loot");
+        thoughtBubble = atlasGame.createSprite("thoughtBubble");
+        for (Mood mood : Mood.values()) {
+            moods.put(mood, atlasGame.createSprite("mood-" + mood.toString().toLowerCase()));
+        }
 	}
 
 	private static Sprite colorSprite(Color color, int width, int height) {

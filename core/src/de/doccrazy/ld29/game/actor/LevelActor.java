@@ -10,12 +10,14 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
 import de.doccrazy.ld29.core.Resource;
 import de.doccrazy.ld29.game.GameWorld;
 import de.doccrazy.ld29.game.base.RegularAction;
+import de.doccrazy.ld29.game.level.Category;
 import de.doccrazy.ld29.game.level.Level;
 import de.doccrazy.ld29.game.level.TileType;
 
@@ -24,9 +26,10 @@ public class LevelActor extends Actor {
     private GameWorld world;
     private Map<Point, Body> bodies = new HashMap<>();
 
-    public LevelActor(GameWorld world, Level level) {
+    public LevelActor(GameWorld world, Level level, int x) {
         this.world = world;
         this.level = level;
+        setX(x);
         world.stage.addActor(this);
         initBodies();
         addAction(new UpdateTilesAction());
@@ -41,7 +44,7 @@ public class LevelActor extends Actor {
     void createBodyForTile(Point pos, TileType value) {
         BodyDef tileBodyDef = new BodyDef();
         // Set its world position
-        tileBodyDef.position.set(new Vector2(pos.x + 0.5f, pos.y + 0.5f));
+        tileBodyDef.position.set(new Vector2(getX() + pos.x + 0.5f, getY() + pos.y + 0.5f));
 
         Body body = world.box2dWorld.createBody(tileBodyDef);
         body.setUserData(this);
@@ -51,8 +54,12 @@ public class LevelActor extends Actor {
         // Set the polygon shape as a box which is twice the size of our view port and 20 high
         // (setAsBox takes half-width and half-height as arguments)
         groundBox.setAsBox(0.5f, 0.5f);
+        FixtureDef def = new FixtureDef();
+        def.shape = groundBox;
+        def.density = 0f;
+        def.filter.categoryBits = Category.LEVEL;
         // Create a fixture from our polygon shape and add it to our ground body
-        body.createFixture(groundBox, 0.0f);
+        body.createFixture(def);
         // Clean up after ourselves
         groundBox.dispose();
 
@@ -84,13 +91,21 @@ public class LevelActor extends Actor {
             Sprite sprite = Resource.tiles.get(entry.getValue());
             Point point = entry.getKey();
             if (sprite != null) {
-                batch.draw(sprite, point.x + getOriginX(), point.y + getOriginY(), 0, 0, 1, 1, 1, 1, 0);
+                batch.draw(sprite, getX() + point.x + getOriginX(), getY() + point.y + getOriginY(), 0, 0, 1, 1, 1, 1, 0);
             }
         }
     }
 
     public Level getLevel() {
         return level;
+    }
+
+    public Point getTileIndex(Vector2 coord) {
+        return getTileIndex(coord.x, coord.y);
+    }
+
+    public Point getTileIndex(float x, float y) {
+        return new Point((int)Math.floor(x - getX()), (int)Math.floor(y - getY()));
     }
 }
 

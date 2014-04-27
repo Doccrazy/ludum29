@@ -1,5 +1,8 @@
 package de.doccrazy.ld29.game;
 
+import box2dLight.DirectionalLight;
+import box2dLight.Light;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -13,6 +16,7 @@ import de.doccrazy.ld29.core.Debug;
 import de.doccrazy.ld29.core.Resource;
 import de.doccrazy.ld29.game.base.ActorListener;
 import de.doccrazy.ld29.game.base.Box2dActor;
+import de.doccrazy.ld29.game.level.Category;
 
 public class GameRenderer implements ActorListener {
     // here we set up the actual viewport size of the game in meters.
@@ -37,7 +41,9 @@ public class GameRenderer implements ActorListener {
         // we obtain a reference to the game stage camera. The camera is scaled to box2d meter units
         camera = (OrthographicCamera) world.stage.getCamera();
 
-        world.rayHandler.setAmbientLight(new Color(0.05f, 0.1f, 0.05f, 0.5f));
+        world.rayHandler.setAmbientLight(new Color(0.05f, 0.1f, 0.05f, 0.15f));
+        DirectionalLight sun = new DirectionalLight(world.rayHandler, 100, new Color(1.0f, 1.0f, 0.5f, 0.6f), -60);
+        Light.setContactFilter(Category.LIGHT, (short)0, Category.LEVEL);
     }
 
     private void drawBackground() {

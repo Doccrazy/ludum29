@@ -5,6 +5,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import box2dLight.PointLight;
+
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
@@ -24,7 +27,6 @@ import de.doccrazy.ld29.game.GameWorld;
 import de.doccrazy.ld29.game.base.Box2dActor;
 import de.doccrazy.ld29.game.base.CollisionListener;
 import de.doccrazy.ld29.game.level.Category;
-import de.doccrazy.ld29.game.level.Level;
 
 public class DiggerActor extends Box2dActor implements CollisionListener {
     public static final float RADIUS = 0.4f;
@@ -32,14 +34,19 @@ public class DiggerActor extends Box2dActor implements CollisionListener {
     private static final float VELOCITY = 10.f;
 
     private Map<Body, ContactInfo> floorContacts = new HashMap<Body, ContactInfo>();
+    private PointLight light;
     private float orientation = 1;
     private float movement = 0;
-    private boolean digging = false;
+    private float stateTime = 0;
 
+    private Mood mood;
+    private float moodTimer;
     private int level = 0;
 
     public DiggerActor(GameWorld w, Vector2 spawn) {
         super(w);
+
+        setMood(Math.random() < 0.5 ? Mood.MONEY : Mood.DIAMOND, 2f);
 
         // generate bob's box2d body
         CircleShape circle = new CircleShape();
@@ -76,6 +83,9 @@ public class DiggerActor extends Box2dActor implements CollisionListener {
         //this.setScaling(Scaling.stretch); // stretch the texture
         //this.setAlign(Align.center);
 
+        light = new PointLight(world.rayHandler, 100, new Color(1f,0.4f,0.0f,0.7f), 1, 0, 0);
+        light.setSoftnessLength(5);
+
         addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -89,10 +99,16 @@ public class DiggerActor extends Box2dActor implements CollisionListener {
     public void act(float delta) {
         super.act(delta);
 
+        stateTime += delta;
         processContacts();
         move(delta);
 
-        if (world.getCurrentLevel().getLevel().tileAt(Level.getTileIndex(getX() + RADIUS, getY() + RADIUS)) != null) {
+        moodTimer -= delta;
+        if (moodTimer < 0) {
+            mood = null;
+        }
+
+        if (world.getCurrentLevel().getLevel().tileAt(world.getCurrentLevel().getTileIndex(getX() + RADIUS, getY() + RADIUS)) != null) {
             kill();
         }
     }
@@ -127,6 +143,9 @@ public class DiggerActor extends Box2dActor implements CollisionListener {
         setOrigin(RADIUS, RADIUS);
         setRotation(MathUtils.radiansToDegrees * body.getAngle());
         setPosition(body.getPosition().x-RADIUS, body.getPosition().y-RADIUS);
+        light.setPosition(body.getPosition().x, body.getPosition().y + RADIUS*2f);
+        light.setDistance((float)(7f + 1f*Math.sin(stateTime*20)));
+        light.setActive(body.getPosition().y < -5);
 
         Matrix4 mat = batch.getTransformMatrix();
         Matrix4 old = mat.cpy();
@@ -139,7 +158,15 @@ public class DiggerActor extends Box2dActor implements CollisionListener {
         }
         batch.draw(frame, -getOriginX(), -getOriginY(), 0, 0,
                 RADIUS*2, RADIUS*3, getScaleX(), getScaleY(), 0);
+
         batch.setTransformMatrix(old);
+
+        if (mood != null) {
+            batch.draw(Resource.thoughtBubble, getX() + 2*getOriginX(), getY() + 2*getOriginY(), 0, 0,
+                    2.5f, 2f, getScaleX(), getScaleY(), 0);
+            batch.draw(Resource.moods.get(mood), getX() + 2*getOriginX() + 0.75f, getY() + 2*getOriginY() + 0.65f, 0, 0,
+                    1.2f, 1.2f, getScaleX(), getScaleY(), 0);
+        }
     }
 
     public void addFloorContact(Body body, Vector2 point) {
@@ -187,6 +214,15 @@ public class DiggerActor extends Box2dActor implements CollisionListener {
         }
     }
 
+    @Override
+    public boolean remove() {
+        boolean ret = super.remove();
+        if (ret) {
+            light.remove();
+        }
+        return ret;
+    }
+
     public void setMovement(float movement) {
         this.movement = movement;
     }
@@ -201,5 +237,14 @@ public class DiggerActor extends Box2dActor implements CollisionListener {
 
     public void setLevel(int level) {
         this.level = level;
+    }
+
+    public Mood getMood() {
+        return mood;
+    }
+
+    public void setMood(Mood mood, float time) {
+        this.mood = mood;
+        this.moodTimer = time;
     }
 }

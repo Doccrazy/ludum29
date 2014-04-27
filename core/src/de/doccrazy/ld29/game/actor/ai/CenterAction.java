@@ -1,7 +1,9 @@
-package de.doccrazy.ld29.game.actor;
+package de.doccrazy.ld29.game.actor.ai;
 
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+
+import de.doccrazy.ld29.game.actor.DiggerActor;
 
 public class CenterAction extends Action {
     private float xTarget;

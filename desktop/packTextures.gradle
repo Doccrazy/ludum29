@@ -16,7 +16,7 @@ task packTextures() << {
         wrapX = 'Repeat'
         wrapY = 'Repeat'
     } as com.badlogic.gdx.tools.texturepacker.TexturePacker.Settings
-    com.badlogic.gdx.tools.texturepacker.TexturePacker.processIfModified(
+    com.badlogic.gdx.tools.texturepacker.TexturePacker.process(
             settings, project.assetsSrcDir.path, sourceSets.main.output.resourcesDir.path, 'game.atlas')
 }
 processResources.dependsOn packTextures

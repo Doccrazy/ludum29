@@ -1,4 +1,4 @@
-package de.doccrazy.ld29.game.actor;
+package de.doccrazy.ld29.game.actor.ai;
 
 public class MoveForwardAction extends CenterAction {
     private boolean right;

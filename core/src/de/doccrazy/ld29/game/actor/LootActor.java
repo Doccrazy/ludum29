@@ -1,9 +1,11 @@
 package de.doccrazy.ld29.game.actor;
 
+import box2dLight.PointLight;
+
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -14,13 +16,13 @@ import de.doccrazy.ld29.core.Resource;
 import de.doccrazy.ld29.game.GameWorld;
 import de.doccrazy.ld29.game.base.Box2dActor;
 import de.doccrazy.ld29.game.level.Category;
-import de.doccrazy.ld29.game.level.Level;
 
 public class LootActor extends Box2dActor {
     public static final float RADIUS = 0.1f;
     private float stateTime = 0f;
     private int type;
     private boolean dead;
+    private PointLight light;
 
     public LootActor(GameWorld world, Vector2 spawn) {
         super(world);
@@ -44,8 +46,9 @@ public class LootActor extends Box2dActor {
         FixtureDef fixDef = new FixtureDef();
         fixDef.shape = circle;
         fixDef.filter.categoryBits = Category.LOOT;
-        fixDef.friction = 20f;
-        fixDef.restitution = 0f;
+        fixDef.friction = 3f;
+        fixDef.restitution = 0.1f;
+        fixDef.density = 1;
         body.createFixture(fixDef);
 
         circle.dispose();
@@ -55,6 +58,9 @@ public class LootActor extends Box2dActor {
         this.setSize(RADIUS*2, RADIUS*2); // scale actor to body's size
         //this.setScaling(Scaling.stretch); // stretch the texture
         //this.setAlign(Align.center);
+
+        light = new PointLight(world.rayHandler, 5, new Color(1f,1f,1f,0.65f), 0.75f, 0, 0);
+        light.setXray(true);
 
         type = (int) (Math.random() * Resource.loot.size);
     }
@@ -69,7 +75,7 @@ public class LootActor extends Box2dActor {
         stateTime += delta;
 
         if (stateTime > 0.25f &&
-                world.getCurrentLevel().getLevel().tileAt(Level.getTileIndex(getX() + RADIUS, getY() + RADIUS)) != null) {
+                world.getCurrentLevel().getLevel().tileAt(world.getCurrentLevel().getTileIndex(getX() + RADIUS, getY() + RADIUS)) != null) {
             remove();
         }
     }
@@ -79,19 +85,24 @@ public class LootActor extends Box2dActor {
         setOrigin(RADIUS, RADIUS);
         setRotation(MathUtils.radiansToDegrees * body.getAngle());
         setPosition(body.getPosition().x-RADIUS, body.getPosition().y-RADIUS);
+        light.setPosition(body.getPosition().x, body.getPosition().y);
 
-        Matrix4 mat = batch.getTransformMatrix();
-        Matrix4 old = mat.cpy();
-        mat.trn(getX() + getOriginX(), getY() + getOriginY(), 0);
-        batch.setTransformMatrix(mat);
         TextureRegion frame = Resource.loot.get(type);
-        batch.draw(frame, -getOriginX(), -getOriginY(), 0, 0,
+        batch.draw(frame, getX() - RADIUS, getY(), 0, 0,
                 RADIUS*5, RADIUS*5, getScaleX(), getScaleY(), 0);
-        batch.setTransformMatrix(old);
     }
 
     public void kill() {
         dead = true;
+    }
+
+    @Override
+    public boolean remove() {
+        boolean ret = super.remove();
+        if (ret) {
+            light.remove();
+        }
+        return ret;
     }
 
 }

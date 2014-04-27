@@ -9,8 +9,6 @@ import java.util.Map.Entry;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.RandomUtils;
 
-import com.badlogic.gdx.math.Vector2;
-
 public class Level {
     private Map<Point, TileType> map = new HashMap<>();
     private Map<Point, Float> health = new HashMap<>();
@@ -192,14 +190,6 @@ public class Level {
             result = result * 5f;
         }
         return result;
-    }
-
-    public static Point getTileIndex(Vector2 coord) {
-        return getTileIndex(coord.x, coord.y);
-    }
-
-    public static Point getTileIndex(float x, float y) {
-        return new Point((int)Math.floor(x), (int)Math.floor(y));
     }
 
 }
