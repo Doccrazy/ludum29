@@ -7,6 +7,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.utils.Scaling;
@@ -42,7 +43,7 @@ public class GameRenderer implements ActorListener {
         camera = (OrthographicCamera) world.stage.getCamera();
 
         world.rayHandler.setAmbientLight(new Color(0.05f, 0.1f, 0.05f, 0.15f));
-        DirectionalLight sun = new DirectionalLight(world.rayHandler, 100, new Color(1.0f, 1.0f, 0.5f, 0.6f), -60);
+        DirectionalLight sun = new DirectionalLight(world.rayHandler, 1000, new Color(1.0f, 1.0f, 0.5f, 0.6f), -60);
         Light.setContactFilter(Category.LIGHT, (short)0, Category.LEVEL);
     }
 
@@ -73,7 +74,7 @@ public class GameRenderer implements ActorListener {
     }
 
 	private void positionCamera() {
-	    zoom = clip(zoom + zoomDelta*0.02f, 1f, 7f);
+	    zoom = MathUtils.clamp(zoom + zoomDelta*0.02f, 1f, 2f);
 		ExtendViewport vp = (ExtendViewport)world.stage.getViewport();
 		vp.setMinWorldWidth(UNIT_WIDTH*zoom);
 		vp.setMinWorldHeight(UNIT_HEIGHT*zoom);
@@ -88,11 +89,7 @@ public class GameRenderer implements ActorListener {
     	//camera.position.x = cameraPos.x;
     	//camera.position.y = cameraPos.y;
         camera.position.x = world.stage.getWidth() / 2;
-        camera.position.y = -4;
-	}
-
-	private float clip(float value, float min, float max) {
-		return Math.min(Math.max(value, min), max);
+        camera.position.y = -6;
 	}
 
 	@Override

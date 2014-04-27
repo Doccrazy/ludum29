@@ -6,10 +6,12 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 
 import de.doccrazy.ld29.game.GameWorld;
 import de.doccrazy.ld29.game.actor.DiggerActor;
+import de.doccrazy.ld29.game.actor.Tool;
 import de.doccrazy.ld29.game.base.RegularAction;
 
 public class DigDownAction extends RegularAction {
     private GameWorld world;
+    private boolean done;
 
     public DigDownAction(GameWorld world) {
         super(1f);
@@ -20,17 +22,28 @@ public class DigDownAction extends RegularAction {
     public void setActor(Actor actor) {
         super.setActor(actor);
         if (actor != null) {
-            setDelay(1f - ((DiggerActor)actor).getLevel() * 0.1f);
+            setDelay(((DiggerActor)actor).getHackDelay());
         }
+    }
+
+    @Override
+    protected void init() {
+        ((DiggerActor)actor).setTool(Tool.PICKAXE);
+    }
+
+    @Override
+    protected void done() {
+        ((DiggerActor)actor).setTool(null);
+        done = false;
     }
 
     @Override
     protected boolean run(float delta) {
         Point pos = world.getCurrentLevel().getTileIndex(getActor().getX() + 0.5f, getActor().getY() - 0.5f);
-        if (world.getCurrentLevel().getLevel().tileAt(pos) != null) {
-            world.getCurrentLevel().pickaxe(pos, 1 + ((DiggerActor)actor).getLevel() * 0.5f);
-            return world.getCurrentLevel().getLevel().tileAt(pos) == null;
+        if (done || world.getCurrentLevel().getLevel().tileAt(pos) == null) {
+            return true;
         }
+        done = world.getCurrentLevel().pickaxe(pos, ((DiggerActor)actor).getHackDamage());
         return false;
     }
 

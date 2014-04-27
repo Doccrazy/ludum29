@@ -1,13 +1,12 @@
 package de.doccrazy.ld29.game.actor;
 
+import box2dLight.Light;
 import box2dLight.PointLight;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.CircleShape;
@@ -16,15 +15,11 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import de.doccrazy.ld29.core.Resource;
 import de.doccrazy.ld29.game.GameWorld;
 import de.doccrazy.ld29.game.base.Box2dActor;
-import de.doccrazy.ld29.game.base.CollisionListener;
-import de.doccrazy.ld29.game.level.Category;
 
-public class LootActor extends Box2dActor implements CollisionListener {
+public class LavaballActor extends Box2dActor {
     public static final float RADIUS = 0.1f;
-    private int type;
-    private PointLight light;
 
-    public LootActor(GameWorld world, Vector2 spawn) {
+    public LavaballActor(GameWorld world, Vector2 spawn) {
         super(world);
 
         // generate bob's box2d body
@@ -36,7 +31,7 @@ public class LootActor extends Box2dActor implements CollisionListener {
         bodyDef.position.x = spawn.x + (float)Math.random() * 0.1f - 0.05f;
         bodyDef.position.y = spawn.y + RADIUS + 0.1f + (float)Math.random() * 0.1f - 0.05f;
         bodyDef.linearDamping = 0.1f;
-        bodyDef.angularDamping = 0.8f;
+        bodyDef.angularDamping = 0.5f;
         bodyDef.linearVelocity.x = 20f * ((float)Math.random() - 0.5f);
         bodyDef.linearVelocity.y = 20f * ((float)Math.random() - 0.5f);
 
@@ -45,7 +40,7 @@ public class LootActor extends Box2dActor implements CollisionListener {
 
         FixtureDef fixDef = new FixtureDef();
         fixDef.shape = circle;
-        fixDef.filter.categoryBits = Category.LOOT;
+        //fixDef.filter.categoryBits = Category.LOOT;
         fixDef.friction = 3f;
         fixDef.restitution = 0.1f;
         fixDef.density = 1;
@@ -59,10 +54,9 @@ public class LootActor extends Box2dActor implements CollisionListener {
         //this.setScaling(Scaling.stretch); // stretch the texture
         //this.setAlign(Align.center);
 
-        light = new PointLight(world.rayHandler, 5, new Color(1f,1f,1f,0.65f), 0.75f, 0, 0);
+        Light light = new PointLight(world.rayHandler, 5, new Color(1f,0.3f,0f,0.65f), 0, 0, 0);
         light.setXray(true);
-
-        type = (int) (Math.random() * Resource.loot.size);
+        lights.add(light);
     }
 
     @Override
@@ -72,8 +66,8 @@ public class LootActor extends Box2dActor implements CollisionListener {
             return;
         }
 
-        if (stateTime > 0.25f &&
-                world.getCurrentLevel().getLevel().tileAt(world.getCurrentLevel().getTileIndex(getX() + RADIUS, getY() + RADIUS)) != null) {
+        if (stateTime > 5f || (stateTime > 0.25f &&
+                world.getCurrentLevel().getLevel().tileAt(world.getCurrentLevel().getTileIndex(getX() + RADIUS, getY() + RADIUS)) != null)) {
             kill();
         }
     }
@@ -83,31 +77,15 @@ public class LootActor extends Box2dActor implements CollisionListener {
         setOrigin(RADIUS, RADIUS);
         setRotation(MathUtils.radiansToDegrees * body.getAngle());
         setPosition(body.getPosition().x-RADIUS, body.getPosition().y-RADIUS);
-        light.setPosition(body.getPosition().x, body.getPosition().y);
 
-        TextureRegion frame = Resource.loot.get(type);
-        batch.draw(frame, getX() - RADIUS, getY(), 0, 0,
+        float cool = MathUtils.clamp(1 - stateTime/8f, 0, 1);
+        lights.get(0).setDistance(cool * 0.75f);
+        lights.get(0).setPosition(body.getPosition().x, body.getPosition().y);
+
+        batch.setColor(cool, cool, cool, cool);
+        batch.draw(Resource.lavaball, getX() - RADIUS, getY(), 0, 0,
                 RADIUS*5, RADIUS*5, getScaleX(), getScaleY(), 0);
-    }
-
-    @Override
-    public void beginContact(Body me, Body other, Vector2 normal, Vector2 contactPoint) {
-        if (other.getUserData() instanceof LavaballActor) {
-            kill();
-        }
-    }
-
-    @Override
-    public void endContact(Body other) {
-    }
-
-    @Override
-    public boolean remove() {
-        boolean ret = super.remove();
-        if (ret) {
-            light.remove();
-        }
-        return ret;
+        batch.setColor(1f, 1f, 1f, 1f);
     }
 
 }

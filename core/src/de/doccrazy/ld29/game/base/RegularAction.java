@@ -8,6 +8,8 @@ public abstract class RegularAction extends Action {
     private float deltaCache = 0;
     private boolean enabled = true;
 
+    private boolean inited;
+
     public RegularAction(float delay) {
         this.delay = delay;
     }
@@ -17,15 +19,26 @@ public abstract class RegularAction extends Action {
         if (!enabled) {
             return false;
         }
+        if (!inited) {
+            init();
+            inited = true;
+        }
         deltaCache += delta;
 
         while (deltaCache >= delay) {
             deltaCache -= delay;
             if (run(delay)) {
+                done();
                 return true;
             }
         }
         return false;
+    }
+
+    protected void init() {
+    }
+
+    protected void done() {
     }
 
     public void setEnabled(boolean enabled) {
@@ -38,6 +51,11 @@ public abstract class RegularAction extends Action {
 
     public void setDelay(float delay) {
         this.delay = delay;
+    }
+
+    @Override
+    public void restart() {
+        inited = false;
     }
 
     abstract protected boolean run(float delta);

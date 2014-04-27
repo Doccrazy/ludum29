@@ -1,5 +1,6 @@
 package de.doccrazy.ld29.game.actor;
 
+import java.awt.Point;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -27,6 +28,7 @@ import de.doccrazy.ld29.game.GameWorld;
 import de.doccrazy.ld29.game.base.Box2dActor;
 import de.doccrazy.ld29.game.base.CollisionListener;
 import de.doccrazy.ld29.game.level.Category;
+import de.doccrazy.ld29.game.level.TileType;
 
 public class DiggerActor extends Box2dActor implements CollisionListener {
     public static final float RADIUS = 0.4f;
@@ -37,15 +39,15 @@ public class DiggerActor extends Box2dActor implements CollisionListener {
     private PointLight light;
     private float orientation = 1;
     private float movement = 0;
-    private float stateTime = 0;
-
     private Mood mood;
     private float moodTimer;
+    private Tool tool;
     private int level = 0;
 
     public DiggerActor(GameWorld w, Vector2 spawn) {
         super(w);
 
+        setLevel((int) (Math.random() * 8));
         setMood(Math.random() < 0.5 ? Mood.MONEY : Mood.DIAMOND, 2f);
 
         // generate bob's box2d body
@@ -85,6 +87,7 @@ public class DiggerActor extends Box2dActor implements CollisionListener {
 
         light = new PointLight(world.rayHandler, 100, new Color(1f,0.4f,0.0f,0.7f), 1, 0, 0);
         light.setSoftnessLength(5);
+        lights.add(light);
 
         addListener(new InputListener() {
             @Override
@@ -99,6 +102,10 @@ public class DiggerActor extends Box2dActor implements CollisionListener {
     public void act(float delta) {
         super.act(delta);
 
+        if (dead) {
+            return;
+        }
+
         stateTime += delta;
         processContacts();
         move(delta);
@@ -111,6 +118,18 @@ public class DiggerActor extends Box2dActor implements CollisionListener {
         if (world.getCurrentLevel().getLevel().tileAt(world.getCurrentLevel().getTileIndex(getX() + RADIUS, getY() + RADIUS)) != null) {
             kill();
         }
+    }
+
+    @Override
+    protected void die() {
+        Vector2 pos = getBody().getPosition();
+        if (remove()) {
+            for (int i = 0; i < ((int)20f * Math.random()); i++) {
+                new LootActor(this.world, pos);
+            }
+            Resource.die.play();
+        }
+        super.die();
     }
 
     private void processContacts() {
@@ -157,7 +176,15 @@ public class DiggerActor extends Box2dActor implements CollisionListener {
             //frame = Resource.playerWalk.getKeyFrame(stateTime, true);
         }
         batch.draw(frame, -getOriginX(), -getOriginY(), 0, 0,
-                RADIUS*2, RADIUS*3, getScaleX(), getScaleY(), 0);
+                RADIUS*2, RADIUS*4, getScaleX(), getScaleY(), 0);
+
+        if (tool != null) {
+            batch.draw(Resource.tools.get(tool), -0.25f, -0.1f, 0.2f, 0.5f,
+                    1f, 1f, getScaleX(), getScaleY(), ((-stateTime / getHackDelay()) % 1f) * 360f);
+        } else {
+            batch.draw(Resource.toolNone, -0.25f, -0.1f, 0.2f, 0.5f,
+                    1f, 1f, getScaleX(), getScaleY(), -90 + (float)Math.sin(stateTime*3) * 30);
+        }
 
         batch.setTransformMatrix(old);
 
@@ -192,7 +219,17 @@ public class DiggerActor extends Box2dActor implements CollisionListener {
     @Override
     public void beginContact(Body me, Body other, Vector2 normal, Vector2 contactPoint) {
         if (other.getUserData() instanceof LootActor) {
-            ((LootActor)other.getUserData()).kill();
+            ((Box2dActor)other.getUserData()).kill();
+            Resource.pickupLoot.play();
+        }
+        if (other.getUserData() instanceof LevelActor) {
+            Point tile = world.getCurrentLevel().getTileIndex(other.getPosition());
+            if (world.getCurrentLevel().getLevel().tileAt(tile) == TileType.LAVA) {
+                kill();
+            }
+        }
+        if (other.getUserData() instanceof LavaballActor) {
+            kill();
         }
         if (normal.y > 0.707f && !other.getFixtureList().get(0).isSensor()) {   //45 deg
             addFloorContact(other, contactPoint);
@@ -202,25 +239,6 @@ public class DiggerActor extends Box2dActor implements CollisionListener {
     @Override
     public void endContact(Body other) {
         removeFloorContact(other);
-    }
-
-    public void kill() {
-        Vector2 pos = getBody().getPosition();
-        if (remove()) {
-            for (int i = 0; i < ((int)20f * Math.random()); i++) {
-                new LootActor(this.world, pos);
-            }
-            //Resource.die.play();
-        }
-    }
-
-    @Override
-    public boolean remove() {
-        boolean ret = super.remove();
-        if (ret) {
-            light.remove();
-        }
-        return ret;
     }
 
     public void setMovement(float movement) {
@@ -239,6 +257,14 @@ public class DiggerActor extends Box2dActor implements CollisionListener {
         this.level = level;
     }
 
+    public float getHackDelay() {
+        return 0.5f - level * 0.025f;
+    }
+
+    public float getHackDamage() {
+        return 1 + level * 0.5f;
+    }
+
     public Mood getMood() {
         return mood;
     }
@@ -246,5 +272,9 @@ public class DiggerActor extends Box2dActor implements CollisionListener {
     public void setMood(Mood mood, float time) {
         this.mood = mood;
         this.moodTimer = time;
+    }
+
+    public void setTool(Tool tool) {
+        this.tool = tool;
     }
 }

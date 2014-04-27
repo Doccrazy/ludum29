@@ -14,6 +14,8 @@ public abstract class Box2dActor extends Actor {
 	protected GameWorld world;
 	protected Body body;
 	protected List<Light> lights = new ArrayList<>();
+    protected boolean dead;
+    protected float stateTime = 0f;
 
 	public Box2dActor(GameWorld world) {
 		this.world = world;
@@ -24,6 +26,24 @@ public abstract class Box2dActor extends Actor {
 	public Body getBody() {
 		return body;
 	}
+
+	@Override
+	public void act(float delta) {
+	    if (dead) {
+	        die();
+	        return;
+	    }
+	    super.act(delta);
+        stateTime += delta;
+	}
+
+    protected void die() {
+        remove();
+    }
+
+    public void kill() {
+        dead = true;
+    }
 
 	@Override
 	public boolean remove() {

@@ -5,6 +5,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import box2dLight.Light;
+import box2dLight.PointLight;
+
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
@@ -23,8 +27,9 @@ import de.doccrazy.ld29.game.level.TileType;
 
 public class LevelActor extends Actor {
     private Level level;
-    private GameWorld world;
+    GameWorld world;
     private Map<Point, Body> bodies = new HashMap<>();
+    private Map<Body, Light> lights = new HashMap<>();
 
     public LevelActor(GameWorld world, Level level, int x) {
         this.world = world;
@@ -64,25 +69,38 @@ public class LevelActor extends Actor {
         groundBox.dispose();
 
         bodies.put(pos, body);
+
+        if (value == TileType.LAVA) {
+            PointLight light = new PointLight(world.rayHandler, 5, new Color(1.0f, 0.3f, 0, 0.5f), 2.5f, body.getPosition().x, body.getPosition().y);
+            light.setXray(true);
+            lights.put(body, light);
+        }
     }
 
     public void clearTile(Point pos) {
         level.clear(pos);
         if (bodies.containsKey(pos)) {
-            world.box2dWorld.destroyBody(bodies.get(pos));
+            Body body = bodies.get(pos);
+            if (lights.containsKey(body)) {
+                lights.get(body).remove();
+            }
+            world.box2dWorld.destroyBody(body);
             bodies.remove(pos);
         }
     }
 
-    public void pickaxe(Point pos, float strength) {
+    public boolean pickaxe(Point pos, float strength) {
         Float hp = level.healthAt(pos);
         if (hp != null && hp > 0) {
+            Resource.pickaxe.play();
             hp = hp - strength;
             level.put(pos, hp);
             if (hp <= 0) {
                 clearTile(pos);
+                return true;
             }
         }
+        return false;
     }
 
     @Override
@@ -106,6 +124,10 @@ public class LevelActor extends Actor {
 
     public Point getTileIndex(float x, float y) {
         return new Point((int)Math.floor(x - getX()), (int)Math.floor(y - getY()));
+    }
+
+    public Vector2 tileToWorld(Point pos) {
+        return new Vector2(pos.x + getX() + 0.5f, pos.y + getY() + 0.5f);
     }
 }
 
@@ -135,12 +157,21 @@ class UpdateTilesAction extends RegularAction {
         HashMap<Point, TileType> oldMap = new HashMap<>(level.getMap());
         for (Entry<Point, TileType> entry : oldMap.entrySet()) {
             Point below = new Point(entry.getKey().x, entry.getKey().y - 1);
+            Point right = new Point(entry.getKey().x + 1, entry.getKey().y);
+            Point left = new Point(entry.getKey().x - 1, entry.getKey().y);
             if ((entry.getValue() == TileType.GRAVEL || entry.getValue() == TileType.SAND)
                     && level.tileAt(below) == null) {
                 level.put(below, entry.getValue());
                 levelActor.createBodyForTile(below, entry.getValue());
                 level.put(below, level.healthAt(entry.getKey()));
                 levelActor.clearTile(entry.getKey());
+            }
+            if (entry.getValue() == TileType.LAVA &&
+                    (level.tileAt(below) == null || level.tileAt(left) == null || level.tileAt(right) == null)) {
+                levelActor.clearTile(entry.getKey());
+                for (int i = 0; i < 20; i++) {
+                    new LavaballActor(levelActor.world, levelActor.tileToWorld(entry.getKey()));
+                }
             }
         }
     }

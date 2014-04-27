@@ -16,7 +16,11 @@ public class DiggerAI extends Action {
         this.world = w;
 
         goalSequence = new SequenceAction();
-        goalSequence.addAction(new SidewaysGoal(world));
+        if (Math.random() < 0.5) {
+            goalSequence.addAction(new SidewaysGoal(world));
+        } else {
+            goalSequence.addAction(new DownGoal(world));
+        }
     }
 
     @Override

@@ -9,6 +9,8 @@ import java.util.Map.Entry;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.RandomUtils;
 
+import com.badlogic.gdx.math.MathUtils;
+
 public class Level {
     private Map<Point, TileType> map = new HashMap<>();
     private Map<Point, Float> health = new HashMap<>();
@@ -30,17 +32,17 @@ public class Level {
         put(TileType.DIAMOND, -22);
     }};
     private Map<TileType, Integer> INIT_HEALTH = new HashMap<TileType, Integer>() {{
-        put(TileType.GRASS, 1);
-        put(TileType.DIRT, 1);
-        put(TileType.ROCK, 2);
-        put(TileType.GRAVEL, 1);
-        put(TileType.SAND, 1);
-        put(TileType.OBSIDIAN, 20);
-        put(TileType.COAL, 2);
-        put(TileType.IRON, 3);
-        put(TileType.SILVER, 4);
-        put(TileType.GOLD, 5);
-        put(TileType.DIAMOND, 8);
+        put(TileType.GRASS, 2);
+        put(TileType.DIRT, 2);
+        put(TileType.ROCK, 4);
+        put(TileType.GRAVEL, 2);
+        put(TileType.SAND, 2);
+        put(TileType.OBSIDIAN, 40);
+        put(TileType.COAL, 4);
+        put(TileType.IRON, 6);
+        put(TileType.SILVER, 8);
+        put(TileType.GOLD, 10);
+        put(TileType.DIAMOND, 16);
         put(TileType.WATER, 9999);
         put(TileType.LAVA, 9999);
     }};
@@ -171,18 +173,26 @@ public class Level {
             result = type == TileType.GRASS ? 1 : 0;
             return result;
         }
+        if (x == 0 || x == width - 1 || y == -height + 1) {
+            result = type == TileType.OBSIDIAN ? 1 : 0;
+            return result;
+        }
+        float depth = -y / (float)height;
         switch (type) {
         case DIRT:
-            result = y / (float)height + 1;
+            result = 1 - depth;
             break;
         case ROCK:
-            result = -y / height + 0.5f;
+            result = depth + 0.5f;
             break;
         case GRAVEL:
-            result = 0.3f * -y / height;
+            result = 0.3f * depth;
             break;
         case SAND:
-            result = 0.2f * (y / height + 1);
+            result = 0.2f * (1 - depth);
+            break;
+        case LAVA:
+            result = MathUtils.clamp(depth - 0.5f, 0, 1);
             break;
         default:
         }
