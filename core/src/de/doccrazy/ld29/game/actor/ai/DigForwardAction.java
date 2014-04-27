@@ -49,9 +49,9 @@ public class DigForwardAction extends RegularAction {
         Point pos1 = world.getCurrentLevel().getTileIndex(getActor().getX() + 0.5f + orientation, getActor().getY() + 0.5f);
         Point pos2 = world.getCurrentLevel().getTileIndex(getActor().getX() + 0.5f + orientation, getActor().getY() + 1.5f);
         if (world.getCurrentLevel().getLevel().tileAt(pos1) != null) {
-            world.getCurrentLevel().pickaxe(pos1, ((DiggerActor)actor).getHackDamage());
+            world.getCurrentLevel().pickaxe((DiggerActor)getActor(), pos1, ((DiggerActor)actor).getHackDamage());
         } else if (world.getCurrentLevel().getLevel().tileAt(pos2) != null) {
-            world.getCurrentLevel().pickaxe(pos2, ((DiggerActor)actor).getHackDamage());
+            world.getCurrentLevel().pickaxe((DiggerActor)getActor(), pos2, ((DiggerActor)actor).getHackDamage());
         } else {
             return true;
         }

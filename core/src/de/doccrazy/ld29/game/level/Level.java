@@ -17,21 +17,21 @@ public class Level {
     private int width;
     private int height;
 
-    private Map<TileType, Integer> MIN_DEPTH = new HashMap<TileType, Integer>() {{
+    private static final Map<TileType, Integer> MIN_DEPTH = new HashMap<TileType, Integer>() {{
         put(TileType.COAL, -2);
         put(TileType.IRON, -5);
         put(TileType.SILVER, -8);
         put(TileType.GOLD, -10);
         put(TileType.DIAMOND, -17);
     }};
-    private Map<TileType, Integer> MAX_DEPTH = new HashMap<TileType, Integer>() {{
+    private static final Map<TileType, Integer> MAX_DEPTH = new HashMap<TileType, Integer>() {{
         put(TileType.COAL, -5);
         put(TileType.IRON, -12);
         put(TileType.SILVER, -12);
         put(TileType.GOLD, -15);
         put(TileType.DIAMOND, -22);
     }};
-    private Map<TileType, Integer> INIT_HEALTH = new HashMap<TileType, Integer>() {{
+    private static final Map<TileType, Integer> INIT_HEALTH = new HashMap<TileType, Integer>() {{
         put(TileType.GRASS, 2);
         put(TileType.DIRT, 2);
         put(TileType.ROCK, 4);
@@ -46,7 +46,7 @@ public class Level {
         put(TileType.WATER, 9999);
         put(TileType.LAVA, 9999);
     }};
-    private TileType[] ORES = {TileType.COAL, TileType.IRON, TileType.SILVER, TileType.GOLD, TileType.DIAMOND};
+    public static final TileType[] ORES = {TileType.COAL, TileType.IRON, TileType.SILVER, TileType.GOLD, TileType.DIAMOND};
 
     private Point lookupKey = new Point();
 

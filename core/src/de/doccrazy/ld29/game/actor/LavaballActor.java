@@ -15,6 +15,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import de.doccrazy.ld29.core.Resource;
 import de.doccrazy.ld29.game.GameWorld;
 import de.doccrazy.ld29.game.base.Box2dActor;
+import de.doccrazy.ld29.game.level.Category;
 
 public class LavaballActor extends Box2dActor {
     public static final float RADIUS = 0.1f;
@@ -40,7 +41,7 @@ public class LavaballActor extends Box2dActor {
 
         FixtureDef fixDef = new FixtureDef();
         fixDef.shape = circle;
-        //fixDef.filter.categoryBits = Category.LOOT;
+        fixDef.filter.categoryBits = Category.LAVA;
         fixDef.friction = 3f;
         fixDef.restitution = 0.1f;
         fixDef.density = 1;

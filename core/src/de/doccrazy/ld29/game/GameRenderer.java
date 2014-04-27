@@ -24,6 +24,7 @@ public class GameRenderer implements ActorListener {
     public static float UNIT_WIDTH = 40f;
     public static float UNIT_HEIGHT = UNIT_WIDTH*9f/16f;
 	private static final Vector2 CAMERA_WINDOW = new Vector2(3, 2);
+	private static final float CAM_PPS = 5f;
 
     private SpriteBatch batch = new SpriteBatch();
     private Scaling bgScaling = Scaling.fill;
@@ -33,9 +34,13 @@ public class GameRenderer implements ActorListener {
     private Vector2 playerPos, cameraPos = new Vector2(-100, 100);
 	private float zoom = 1;
 	private float zoomDelta = 0;
+	private float camY;
+    private boolean animateCamera;
 
     public GameRenderer(GameWorld world) {
         this.world = world;
+        UNIT_WIDTH = GameWorld.LEVEL_WIDTH;
+        UNIT_HEIGHT = UNIT_WIDTH*9f/16f;
         world.stage.setViewport(new ExtendViewport(UNIT_WIDTH, UNIT_HEIGHT));
         renderer = new Box2DDebugRenderer();
 
@@ -44,7 +49,8 @@ public class GameRenderer implements ActorListener {
 
         world.rayHandler.setAmbientLight(new Color(0.05f, 0.1f, 0.05f, 0.15f));
         DirectionalLight sun = new DirectionalLight(world.rayHandler, 1000, new Color(1.0f, 1.0f, 0.5f, 0.6f), -60);
-        Light.setContactFilter(Category.LIGHT, (short)0, Category.LEVEL);
+        Light.setContactFilter(Category.DEFAULT, (short)0, Category.LEVEL);
+        camY = UNIT_HEIGHT/2;
     }
 
     private void drawBackground() {
@@ -66,7 +72,7 @@ public class GameRenderer implements ActorListener {
 
         // box2d debug renderering (optional)
         if (Debug.ON) {
-            renderer.render(world.box2dWorld, camera.combined);
+            //renderer.render(world.box2dWorld, camera.combined);
         }
 
         world.rayHandler.setCombinedMatrix(camera.combined);
@@ -88,8 +94,11 @@ public class GameRenderer implements ActorListener {
     	//cameraPos.y = clip(cameraPos.y, playerPos.y - CAMERA_WINDOW.y, playerPos.y + CAMERA_WINDOW.y);
     	//camera.position.x = cameraPos.x;
     	//camera.position.y = cameraPos.y;
+        if (animateCamera) {
+            camY -= Gdx.graphics.getDeltaTime() * CAM_PPS;
+        }
         camera.position.x = world.stage.getWidth() / 2;
-        camera.position.y = -6;
+        camera.position.y = Math.max(camY, -8);
 	}
 
 	@Override
@@ -104,7 +113,8 @@ public class GameRenderer implements ActorListener {
 		this.zoomDelta = zoomDelta;
 	}
 
-	public Vector2 toWorldCoordinates(Vector2 s) {
-	    return world.stage.screenToStageCoordinates(s);
+	public void animateCamera() {
+	    animateCamera = true;
 	}
+
 }

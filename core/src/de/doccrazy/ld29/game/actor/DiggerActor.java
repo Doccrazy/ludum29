@@ -18,7 +18,6 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.CircleShape;
-import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -28,6 +27,7 @@ import de.doccrazy.ld29.game.GameWorld;
 import de.doccrazy.ld29.game.base.Box2dActor;
 import de.doccrazy.ld29.game.base.CollisionListener;
 import de.doccrazy.ld29.game.level.Category;
+import de.doccrazy.ld29.game.level.Mask;
 import de.doccrazy.ld29.game.level.TileType;
 
 public class DiggerActor extends Box2dActor implements CollisionListener {
@@ -47,10 +47,6 @@ public class DiggerActor extends Box2dActor implements CollisionListener {
     public DiggerActor(GameWorld w, Vector2 spawn) {
         super(w);
 
-        setLevel((int) (Math.random() * 8));
-        setLevel(7);
-        setMood(Math.random() < 0.5 ? Mood.MONEY : Mood.DIAMOND, 2f);
-
         // generate bob's box2d body
         CircleShape circle = new CircleShape();
         circle.setRadius(RADIUS);
@@ -65,16 +61,18 @@ public class DiggerActor extends Box2dActor implements CollisionListener {
         this.body = world.box2dWorld.createBody(bodyDef);
         this.body.setUserData(this);
 
-        Fixture fix = body.createFixture(circle, 100);
-        fix.setFriction(20f);
-        fix.setRestitution(0f);
-        //fix.setFilterData(filter);
+        FixtureDef def = new FixtureDef();
+        def.shape = circle;
+        def.friction = 20f;
+        def.restitution = 0f;
+        def.density = 100;
+        def.filter.maskBits = Mask.LEVEL_LOOT_LAVA;
+        body.createFixture(def);
 
         circle.setRadius(1.5f);
         FixtureDef sensor = new FixtureDef();
         sensor.shape = circle;
         sensor.isSensor = true;
-        sensor.filter.categoryBits = Category.LOOT_SENSOR;
         sensor.filter.maskBits = Category.LOOT;
         body.createFixture(sensor);
 
@@ -125,7 +123,7 @@ public class DiggerActor extends Box2dActor implements CollisionListener {
     protected void die() {
         Vector2 pos = getBody().getPosition();
         if (remove()) {
-            for (int i = 0; i < ((int)20f * Math.random()); i++) {
+            for (int i = 0; i < (15f * Math.random() + 5f); i++) {
                 new LootActor(this.world, pos);
             }
             Resource.die.play();
@@ -281,5 +279,24 @@ public class DiggerActor extends Box2dActor implements CollisionListener {
 
     public void setTool(Tool tool) {
         this.tool = tool;
+    }
+
+    public void onMine(TileType type) {
+        if (type == requiredMineral()) {
+            new FloatingTextActor(world, "Level Up!", getX() + RADIUS, getY() + RADIUS*3);
+            world.diggerLevelUp();
+        }
+    }
+
+    public TileType requiredMineral() {
+        switch (level) {
+        case 0: return TileType.COAL;
+        case 1: return TileType.IRON;
+        case 2: return TileType.SILVER;
+        case 3: return TileType.GOLD;
+        case 4: return TileType.DIAMOND;
+        default:
+        }
+        return null;
     }
 }

@@ -6,6 +6,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
@@ -31,9 +32,9 @@ public class GameScreen implements Screen {
         renderer = new GameRenderer(world);
 
 		Gdx.input.setInputProcessor(new InputMultiplexer(uiStage, world.stage));
-		uiStage.getRoot().addListener(new UiInputListener(uiStage, world, renderer));
 
-		uiStage.addActor(new UiRoot(world));
+		new UiRoot(uiStage, world, renderer);
+		uiStage.addListener(new UiInputListener(world, renderer));
 	}
 
 	@Override
@@ -46,6 +47,7 @@ public class GameScreen implements Screen {
 
         renderer.render(); // draw the box2d world
         uiStage.draw(); // draw the GUI
+        Table.drawDebug(uiStage);
 	}
 
 	private void update(float delta) {

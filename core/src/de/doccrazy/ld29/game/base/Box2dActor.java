@@ -45,6 +45,10 @@ public abstract class Box2dActor extends Actor {
         dead = true;
     }
 
+    public boolean isDead() {
+        return dead;
+    }
+
 	@Override
 	public boolean remove() {
 		if (super.remove()) {

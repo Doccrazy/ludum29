@@ -15,7 +15,9 @@ public class DiggerAI extends Action {
         this.world = w;
 
         goalSequence = new SequenceAction();
-        goalSequence.addAction(new FindMineralStrategy(world));
+        if (!world.isGameStarted()) {
+            goalSequence.addAction(new InitialWalkAction());
+        }
     }
 
     @Override
@@ -27,6 +29,15 @@ public class DiggerAI extends Action {
 
     @Override
     public boolean act(float delta) {
+        if (world.isGameStarted() && goalSequence.getActor() == null) {
+            goalSequence.reset();
+            goalSequence.addAction(new FindMineralStrategy(world));
+            getActor().addAction(goalSequence);
+        }
         return false;
+    }
+
+    public void onLevelUp(int diggerLevel) {
+        goalSequence.restart();
     }
 }

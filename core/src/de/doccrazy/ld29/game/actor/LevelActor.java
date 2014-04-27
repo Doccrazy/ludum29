@@ -83,6 +83,7 @@ public class LevelActor extends Actor {
             Body body = bodies.get(pos);
             if (lights.containsKey(body)) {
                 lights.get(body).remove();
+                lights.remove(body);
             }
             world.box2dWorld.destroyBody(body);
             bodies.remove(pos);
@@ -95,13 +96,14 @@ public class LevelActor extends Actor {
         createBodyForTile(pos, type);
     }
 
-    public boolean pickaxe(Point pos, float strength) {
+    public boolean pickaxe(DiggerActor diggerActor, Point pos, float strength) {
         Float hp = level.healthAt(pos);
         if (hp != null && hp > 0) {
-            Resource.pickaxe.play();
+            //Resource.pickaxe.play();
             hp = hp - strength;
             level.put(pos, hp);
             if (hp <= 0) {
+                diggerActor.onMine(level.tileAt(pos));
                 clearTile(pos);
                 return true;
             }

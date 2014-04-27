@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
@@ -28,10 +29,16 @@ public class Resource {
     public static Map<Tool, Sprite> tools = new HashMap<>();
     public static Sprite toolNone;
     public static Sprite lavaball;
+    public static Sprite buttonClear;
+
+    public static BitmapFont fontBig, fontSmall;
 
     public static Sound pickaxe;
     public static Sound die;
     public static Sound pickupLoot;
+    public static Sound levelUp;
+    public static Sound errorSound;
+    public static Sound respawn;
 
     private Resource() {
     }
@@ -80,10 +87,17 @@ public class Resource {
         }
         toolNone = atlasGame.createSprite("tool-none");
         lavaball = atlasGame.createSprite("lavaball");
+        buttonClear = atlasGame.createSprite("clear");
+
+        fontBig = new BitmapFont(Gdx.files.internal("big.fnt"), Gdx.files.internal("big.png"), false);
+        fontSmall = new BitmapFont(Gdx.files.internal("small.fnt"), Gdx.files.internal("small.png"), false);
 
         pickaxe = Gdx.audio.newSound(Gdx.files.internal("pickaxe.wav"));
         die = Gdx.audio.newSound(Gdx.files.internal("die.wav"));
         pickupLoot = Gdx.audio.newSound(Gdx.files.internal("pickupLoot.wav"));
+        levelUp = Gdx.audio.newSound(Gdx.files.internal("levelUp.wav"));
+        errorSound = Gdx.audio.newSound(Gdx.files.internal("error.wav"));
+        respawn = Gdx.audio.newSound(Gdx.files.internal("respawn.wav"));
     }
 
     private static Sprite colorSprite(Color color, int width, int height) {

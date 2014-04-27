@@ -44,7 +44,7 @@ public class DigDownAction extends RegularAction {
         if (done || world.getCurrentLevel().getLevel().tileAt(pos) == null) {
             return true;
         }
-        done = world.getCurrentLevel().pickaxe(pos, ((DiggerActor)actor).getHackDamage());
+        done = world.getCurrentLevel().pickaxe((DiggerActor)getActor(), pos, ((DiggerActor)actor).getHackDamage());
         return false;
     }
 

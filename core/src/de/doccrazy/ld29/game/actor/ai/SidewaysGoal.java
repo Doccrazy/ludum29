@@ -20,6 +20,7 @@ public class SidewaysGoal extends SequenceAction {
         super.setActor(actor);
         addAction(new CenterAction(right));
         addAction(new DigForwardAction(world));
+        addAction(new BuildAction(world, right, true));
         addAction(new MoveForwardAction(right));
         addAction(new DigDownAction(world));
         addAction(new DelayAction(0.3f));

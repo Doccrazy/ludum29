@@ -16,7 +16,7 @@ public class CenterAction extends Action {
 
     @Override
     public void setActor(Actor actor) {
-        if (actor == null) {
+        if (actor == null && getActor() != null) {
             ((DiggerActor)getActor()).setMovement(0);
         }
         super.setActor(actor);

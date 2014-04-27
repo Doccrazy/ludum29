@@ -12,7 +12,7 @@ public class DesktopLauncher {
 		config.width = GameScreen.SCREEN_WIDTH;
 		config.height = GameScreen.SCREEN_HEIGHT;
 		config.vSyncEnabled = true;
-		config.title = "The Dark Side of the Mine (a Ludum Dare 29 game by Doccrazy)";
+		config.title = Main.GAME_TITLE + " (a Ludum Dare 29 game by Doccrazy)";
 		new LwjglApplication(new Main(), config);
 	}
 }
