@@ -26,8 +26,16 @@ public class DigForwardAction extends RegularAction {
     }
 
     @Override
-    protected void init() {
+    protected boolean init() {
+        float orientation = ((DiggerActor)getActor()).getOrientation();
+        Point pos1 = world.getCurrentLevel().getTileIndex(getActor().getX() + 0.5f + orientation, getActor().getY() + 0.5f);
+        Point pos2 = world.getCurrentLevel().getTileIndex(getActor().getX() + 0.5f + orientation, getActor().getY() + 1.5f);
+        if (world.getCurrentLevel().getLevel().tileAt(pos1) == null
+                && world.getCurrentLevel().getLevel().tileAt(pos2) == null) {
+            return true;
+        }
         ((DiggerActor)actor).setTool(Tool.PICKAXE);
+        return false;
     }
 
     @Override

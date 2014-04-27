@@ -4,6 +4,7 @@ public class MoveForwardAction extends CenterAction {
     private boolean right;
 
     public MoveForwardAction(boolean right) {
+        super(null);
         this.right = right;
         threshold = 0.5;
     }

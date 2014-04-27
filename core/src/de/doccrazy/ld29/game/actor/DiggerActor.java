@@ -48,6 +48,7 @@ public class DiggerActor extends Box2dActor implements CollisionListener {
         super(w);
 
         setLevel((int) (Math.random() * 8));
+        setLevel(7);
         setMood(Math.random() < 0.5 ? Mood.MONEY : Mood.DIAMOND, 2f);
 
         // generate bob's box2d body
@@ -153,7 +154,7 @@ public class DiggerActor extends Box2dActor implements CollisionListener {
         }
     }
 
-    private boolean touchingFloor() {
+    public boolean touchingFloor() {
         return floorContacts.size() > 0;
     }
 
@@ -247,6 +248,10 @@ public class DiggerActor extends Box2dActor implements CollisionListener {
 
     public float getOrientation() {
         return orientation;
+    }
+
+    public void setOrientation(float orientation) {
+        this.orientation = orientation;
     }
 
     public int getLevel() {

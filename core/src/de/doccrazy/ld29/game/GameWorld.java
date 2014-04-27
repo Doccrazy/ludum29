@@ -55,9 +55,9 @@ public class GameWorld {
     }
 
     private void createWorld() {
-        Level level = new Level(50, 24);
+        Level level = new Level(42, 24);
         level.random();
-        currentLevel = new LevelActor(this, level, -5);
+        currentLevel = new LevelActor(this, level, -1);
     }
 
     public void spawnDigger(Vector2 pos) {

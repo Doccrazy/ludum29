@@ -5,7 +5,6 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 
 import de.doccrazy.ld29.game.GameWorld;
-import de.doccrazy.ld29.game.actor.DiggerActor;
 
 public class DiggerAI extends Action {
     private GameWorld world;
@@ -16,11 +15,7 @@ public class DiggerAI extends Action {
         this.world = w;
 
         goalSequence = new SequenceAction();
-        if (Math.random() < 0.5) {
-            goalSequence.addAction(new SidewaysGoal(world));
-        } else {
-            goalSequence.addAction(new DownGoal(world));
-        }
+        goalSequence.addAction(new FindMineralStrategy(world));
     }
 
     @Override
@@ -33,9 +28,5 @@ public class DiggerAI extends Action {
     @Override
     public boolean act(float delta) {
         return false;
-    }
-
-    private DiggerActor getDigger() {
-        return (DiggerActor) actor;
     }
 }

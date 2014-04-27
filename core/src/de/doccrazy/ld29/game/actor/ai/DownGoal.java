@@ -15,7 +15,7 @@ public class DownGoal extends SequenceAction {
     @Override
     public void setActor(Actor actor) {
         super.setActor(actor);
-        addAction(new CenterAction());
+        addAction(new CenterAction(null));
         addAction(new DigDownAction(world));
     }
 

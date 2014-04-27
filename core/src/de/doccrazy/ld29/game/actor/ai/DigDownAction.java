@@ -27,8 +27,9 @@ public class DigDownAction extends RegularAction {
     }
 
     @Override
-    protected void init() {
+    protected boolean init() {
         ((DiggerActor)actor).setTool(Tool.PICKAXE);
+        return false;
     }
 
     @Override

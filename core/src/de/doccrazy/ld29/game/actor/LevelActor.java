@@ -89,6 +89,12 @@ public class LevelActor extends Actor {
         }
     }
 
+    public void putTile(Point pos, TileType type) {
+        clearTile(pos);
+        level.put(pos, type);
+        createBodyForTile(pos, type);
+    }
+
     public boolean pickaxe(Point pos, float strength) {
         Float hp = level.healthAt(pos);
         if (hp != null && hp > 0) {

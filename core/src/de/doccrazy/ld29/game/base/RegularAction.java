@@ -20,8 +20,10 @@ public abstract class RegularAction extends Action {
             return false;
         }
         if (!inited) {
-            init();
             inited = true;
+            if (init()) {
+                return true;
+            }
         }
         deltaCache += delta;
 
@@ -35,7 +37,8 @@ public abstract class RegularAction extends Action {
         return false;
     }
 
-    protected void init() {
+    protected boolean init() {
+        return false;
     }
 
     protected void done() {
