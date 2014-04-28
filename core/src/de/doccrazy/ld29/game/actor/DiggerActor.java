@@ -19,8 +19,6 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 
 import de.doccrazy.ld29.core.Resource;
 import de.doccrazy.ld29.game.base.Box2dActor;
@@ -87,14 +85,6 @@ public class DiggerActor extends Box2dActor implements CollisionListener {
         light = new PointLight(world.rayHandler, 100, new Color(1f,0.4f,0.0f,0.7f), 1, 0, 0);
         light.setSoftnessLength(5);
         lights.add(light);
-
-        addListener(new InputListener() {
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                kill();
-                return false;
-            }
-        });
     }
 
     @Override
