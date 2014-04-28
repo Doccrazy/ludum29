@@ -5,26 +5,23 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 
 import de.doccrazy.ld29.core.Debug;
-import de.doccrazy.ld29.game.GameRenderer;
-import de.doccrazy.ld29.game.world.GameWorld;
 
 public class UiInputListener extends InputListener {
-	private GameWorld world;
-	private GameRenderer renderer;
+	private UiRoot root;
 
-	public UiInputListener(GameWorld world, GameRenderer renderer) {
-        this.world = world;
-		this.renderer = renderer;
+    public UiInputListener(UiRoot root) {
+        this.root = root;
 	}
 
 	@Override
     public boolean keyDown(InputEvent event, int keycode) {
 		if (keycode == Keys.ENTER/* && world.isGameFinished()*/) {
-			world.reset();
+			root.getWorld().reset();
+			root.getInput().reset();
 		}
 		if (Debug.ON) {
 			if (keycode == Keys.Z) {
-				renderer.setZoomDelta(1f);
+				root.getRenderer().setZoomDelta(1f);
 			}
 		}
 		return false;
@@ -34,7 +31,7 @@ public class UiInputListener extends InputListener {
 	public boolean keyUp(InputEvent event, int keycode) {
         if (Debug.ON) {
             if (keycode == Keys.Z) {
-                renderer.setZoomDelta(-2f);
+                root.getRenderer().setZoomDelta(-2f);
             }
         }
         return false;

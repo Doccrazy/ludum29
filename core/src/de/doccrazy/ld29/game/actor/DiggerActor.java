@@ -26,6 +26,7 @@ import de.doccrazy.ld29.game.base.CollisionListener;
 import de.doccrazy.ld29.game.level.Category;
 import de.doccrazy.ld29.game.level.Mask;
 import de.doccrazy.ld29.game.level.TileType;
+import de.doccrazy.ld29.game.world.GameRules;
 import de.doccrazy.ld29.game.world.GameWorld;
 
 public class DiggerActor extends Box2dActor implements CollisionListener {
@@ -232,7 +233,7 @@ public class DiggerActor extends Box2dActor implements CollisionListener {
 
     @Override
     public void hit(float force) {
-        if (force > 400) {
+        if (force > GameRules.FALL_DAMAGE) {
             kill();
         }
     }

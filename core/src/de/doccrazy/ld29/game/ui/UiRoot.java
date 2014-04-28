@@ -41,6 +41,8 @@ public class UiRoot extends Table {
 		stage.addActor(new DeathLabel2(world));
 		stage.addActor(new TryAgainLabel(world));
 		stage.addActor(new HighscoreLabel(world));
+
+        stage.addListener(new UiInputListener(this));
 	}
 
 	@Override

@@ -6,6 +6,7 @@ public class GameRules {
 
     public static final float GAME_TIME = 5*60;
     public static final float RESPAWN_DELAY = 2f;
-    public static final float SUPPORT_DELAY = 30f;
+    public static final float SUPPORT_DELAY = 45f;
     public static final int MAX_LEVEL = 5;
+    public static final int FALL_DAMAGE = 500;
 }

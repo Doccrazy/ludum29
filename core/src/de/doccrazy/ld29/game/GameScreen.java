@@ -10,7 +10,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
-import de.doccrazy.ld29.game.ui.UiInputListener;
 import de.doccrazy.ld29.game.ui.UiRoot;
 import de.doccrazy.ld29.game.world.GameWorld;
 
@@ -35,7 +34,6 @@ public class GameScreen implements Screen {
 		Gdx.input.setInputProcessor(new InputMultiplexer(uiStage, world.stage));
 
 		new UiRoot(uiStage, world, renderer);
-		uiStage.addListener(new UiInputListener(world, renderer));
 	}
 
 	@Override

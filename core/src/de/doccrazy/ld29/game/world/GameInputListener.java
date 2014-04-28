@@ -27,9 +27,7 @@ public class GameInputListener extends InputListener {
     public GameInputListener(UiRoot root) {
         this.root = root;
         this.world = root.getWorld();
-        ammo.put(TileType.LAVA, 2);
-        ammo.put(TileType.SAND, 4);
-        ammo.put(null, 10);
+        reset();
     }
 
     @Override
@@ -103,5 +101,12 @@ public class GameInputListener extends InputListener {
 
     public void addAmmo(TileType type, int amount) {
         ammo.put(type, ammo.get(type) + amount);
+    }
+
+    public void reset() {
+        ammo.clear();
+        ammo.put(TileType.LAVA, 2);
+        ammo.put(TileType.SAND, 4);
+        ammo.put(null, 10);
     }
 }
