@@ -84,9 +84,17 @@ public class GameInputListener extends InputListener {
         return false;
     }
 
+    public TileType getCurrentTile() {
+        return currentTile;
+    }
+
     public void setCurrentTile(TileType currentTile) {
         this.currentTile = currentTile;
         selected = true;
+    }
+
+    public boolean isSelected() {
+        return selected;
     }
 
     public Map<TileType, Integer> getAmmo() {

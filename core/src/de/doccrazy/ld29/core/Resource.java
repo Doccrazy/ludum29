@@ -31,6 +31,7 @@ public class Resource {
     public static Sprite toolNone;
     public static Sprite lavaball;
     public static Sprite buttonClear;
+    public static Sprite selection;
 
     public static BitmapFont fontBig, fontSmall;
 
@@ -91,6 +92,7 @@ public class Resource {
         toolNone = atlasGame.createSprite("tool-none");
         lavaball = atlasGame.createSprite("lavaball");
         buttonClear = atlasGame.createSprite("clear");
+        selection = atlasGame.createSprite("selection");
 
         fontBig = new BitmapFont(Gdx.files.internal("big.fnt"), Gdx.files.internal("big.png"), false);
         fontSmall = new BitmapFont(Gdx.files.internal("small.fnt"), Gdx.files.internal("small.png"), false);

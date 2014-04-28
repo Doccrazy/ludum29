@@ -2,6 +2,7 @@ package de.doccrazy.ld29.game.ui;
 
 import java.util.Iterator;
 
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -26,7 +27,18 @@ public class Toolbar extends Table {
     }
 
     private void addTileButton(final TileType type) {
-        Button b = newToolButton(type == null ? Resource.buttonClear : Resource.tiles.get(type));
+        Sprite img = type == null ? Resource.buttonClear : Resource.tiles.get(type);
+        Button b = new Button(new SpriteDrawable(img) {
+            @Override
+            public void draw(Batch batch, float x, float y, float width, float height) {
+                super.draw(batch, x, y, width, height);
+                if (root.getInput().getCurrentTile() == type && root.getInput().isSelected()) {
+                    Resource.selection.setPosition(x-2, y-2);
+                    Resource.selection.draw(batch);
+                }
+            }
+        });
+        add(b).width(32).height(32).expand().space(5);
         b.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -34,12 +46,8 @@ public class Toolbar extends Table {
             }
         });
         b.add(new AmmoLabel(root, type));
-    }
-
-    private Button newToolButton(Sprite img) {
-        Button b = new Button(new SpriteDrawable(img));
-        add(b).width(32).height(32).expand().space(5);
-        return b;
+        //Image i = new Image(Resource.selection);
+        //b.add(i);
     }
 
     @Override
