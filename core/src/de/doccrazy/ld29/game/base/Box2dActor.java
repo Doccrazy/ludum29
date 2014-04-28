@@ -8,7 +8,7 @@ import box2dLight.Light;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
-import de.doccrazy.ld29.game.GameWorld;
+import de.doccrazy.ld29.game.world.GameWorld;
 
 public abstract class Box2dActor extends Actor {
 	protected GameWorld world;

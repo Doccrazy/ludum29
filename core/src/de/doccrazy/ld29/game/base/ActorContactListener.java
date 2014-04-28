@@ -13,7 +13,7 @@ public class ActorContactListener implements ContactListener {
 
 	@Override
 	public void beginContact(Contact contact) {
-		Body a = contact.getFixtureA().getBody();
+	    Body a = contact.getFixtureA().getBody();
 		Body b = contact.getFixtureB().getBody();
 
 		Vector2 normal = contact.getWorldManifold().getNormal();
@@ -47,6 +47,20 @@ public class ActorContactListener implements ContactListener {
 
 	@Override
 	public void postSolve(Contact contact, ContactImpulse impulse) {
+        float[] forces = impulse.getNormalImpulses();
+        float force = 0;
+        for (float f : forces) {
+            force = Math.max(force, f);
+        }
+
+        Body a = contact.getFixtureA().getBody();
+        Body b = contact.getFixtureB().getBody();
+        if (a.getUserData() instanceof CollisionListener) {
+            ((CollisionListener)a.getUserData()).hit(force);
+        }
+        if (b.getUserData() instanceof CollisionListener) {
+            ((CollisionListener)b.getUserData()).hit(force);
+        }
 	}
 
 }

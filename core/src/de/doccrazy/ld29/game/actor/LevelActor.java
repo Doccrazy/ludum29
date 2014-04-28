@@ -2,8 +2,10 @@ package de.doccrazy.ld29.game.actor;
 
 import java.awt.Point;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import box2dLight.Light;
 import box2dLight.PointLight;
@@ -19,11 +21,11 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
 import de.doccrazy.ld29.core.Resource;
-import de.doccrazy.ld29.game.GameWorld;
 import de.doccrazy.ld29.game.base.RegularAction;
 import de.doccrazy.ld29.game.level.Category;
 import de.doccrazy.ld29.game.level.Level;
 import de.doccrazy.ld29.game.level.TileType;
+import de.doccrazy.ld29.game.world.GameWorld;
 
 public class LevelActor extends Actor {
     private Level level;
@@ -111,6 +113,18 @@ public class LevelActor extends Actor {
         return false;
     }
 
+    public void pickSilent(Point pos) {
+        Float hp = level.healthAt(pos);
+        if (hp != null && hp > 0) {
+            //Resource.pickaxe.play();
+            hp = hp - 1;
+            level.put(pos, hp);
+            if (hp <= 0) {
+                clearTile(pos);
+            }
+        }
+    }
+
     @Override
     public void draw(Batch batch, float parentAlpha) {
         for (Entry<Point, TileType> entry : level.getMap().entrySet()) {
@@ -120,6 +134,18 @@ public class LevelActor extends Actor {
                 batch.draw(sprite, getX() + point.x + getOriginX(), getY() + point.y + getOriginY(), 0, 0, 1, 1, 1, 1, 0);
             }
         }
+    }
+
+    @Override
+    public boolean remove() {
+        if (super.remove()) {
+            Set<Point> tiles = new HashSet<>(level.getMap().keySet());
+            for (Point pos : tiles) {
+                clearTile(pos);
+            }
+            return true;
+        }
+        return false;
     }
 
     public Level getLevel() {
@@ -164,6 +190,7 @@ class UpdateTilesAction extends RegularAction {
         LevelActor levelActor = ((LevelActor)actor);
         HashMap<Point, TileType> oldMap = new HashMap<>(level.getMap());
         for (Entry<Point, TileType> entry : oldMap.entrySet()) {
+            Point above = new Point(entry.getKey().x, entry.getKey().y + 1);
             Point below = new Point(entry.getKey().x, entry.getKey().y - 1);
             Point right = new Point(entry.getKey().x + 1, entry.getKey().y);
             Point left = new Point(entry.getKey().x - 1, entry.getKey().y);
@@ -180,6 +207,9 @@ class UpdateTilesAction extends RegularAction {
                 for (int i = 0; i < 20; i++) {
                     new LavaballActor(levelActor.world, levelActor.tileToWorld(entry.getKey()));
                 }
+            }
+            if (entry.getValue() == TileType.LAVA && level.tileAt(above) == null) {
+                levelActor.pickSilent(entry.getKey());
             }
         }
     }

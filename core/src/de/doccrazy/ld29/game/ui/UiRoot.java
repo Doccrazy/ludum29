@@ -6,8 +6,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
 import de.doccrazy.ld29.core.Debug;
 import de.doccrazy.ld29.game.GameRenderer;
-import de.doccrazy.ld29.game.GameWorld;
 import de.doccrazy.ld29.game.actor.FloatingTextActor;
+import de.doccrazy.ld29.game.world.GameInputListener;
+import de.doccrazy.ld29.game.world.GameWorld;
 
 public class UiRoot extends Table {
 	private GameWorld world;
@@ -31,7 +32,15 @@ public class UiRoot extends Table {
 		toolbar = new Toolbar(this);
 		toolbar.setVisible(false);
 		add(toolbar).expandX().left();
+
 		stage.addActor(new IntroLabel(this));
+		stage.addActor(new ScoreLabel(world));
+		stage.addActor(new CheckpointLabel(world));
+		stage.addActor(new TimerLabel(world));
+		stage.addActor(new DeathLabel(world));
+		stage.addActor(new DeathLabel2(world));
+		stage.addActor(new TryAgainLabel(world));
+		stage.addActor(new HighscoreLabel(world));
 	}
 
 	@Override

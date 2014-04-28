@@ -1,6 +1,7 @@
 package de.doccrazy.ld29.game.base;
 
 import com.badlogic.gdx.scenes.scene2d.Action;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 
 public abstract class RegularAction extends Action {
     private float delay;
@@ -46,6 +47,14 @@ public abstract class RegularAction extends Action {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    @Override
+    public void setActor(Actor actor) {
+        if (actor == null && getActor() != null) {
+            done();
+        }
+        super.setActor(actor);
     }
 
     public float getDelay() {

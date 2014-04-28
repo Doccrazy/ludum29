@@ -2,7 +2,7 @@ package de.doccrazy.ld29.game.actor;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
-import de.doccrazy.ld29.game.GameWorld;
+import de.doccrazy.ld29.game.world.GameWorld;
 
 public class FloatingTextActor extends Actor {
     private GameWorld world;

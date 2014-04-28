@@ -6,7 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 
 import de.doccrazy.ld29.core.Debug;
 import de.doccrazy.ld29.game.GameRenderer;
-import de.doccrazy.ld29.game.GameWorld;
+import de.doccrazy.ld29.game.world.GameWorld;
 
 public class UiInputListener extends InputListener {
 	private GameWorld world;
@@ -19,7 +19,7 @@ public class UiInputListener extends InputListener {
 
 	@Override
     public boolean keyDown(InputEvent event, int keycode) {
-		if (keycode == Keys.ENTER) {
+		if (keycode == Keys.ENTER/* && world.isGameFinished()*/) {
 			world.reset();
 		}
 		if (Debug.ON) {

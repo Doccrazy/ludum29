@@ -6,15 +6,15 @@ import com.badlogic.gdx.scenes.scene2d.utils.Align;
 
 import de.doccrazy.ld29.core.Resource;
 
-public class HelpLabel extends Label {
+public class HelpLabel2 extends Label {
     private float stateTime = 0;
 
-    public HelpLabel() {
+    public HelpLabel2() {
         super("", new LabelStyle(Resource.fontSmall, new Color(1f, 0.4f, 0.3f, 0.7f)));
 
         setFillParent(true);
-        setAlignment(Align.center | Align.bottom);
-        setText("Hint: Select your weapon of choice \nby clicking one of the options in the top left.");
+        setAlignment(Align.center);
+        setText("You cannot place blocks on ores or in the open.");
     }
 
     @Override

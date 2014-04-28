@@ -4,10 +4,10 @@ import java.awt.Point;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
-import de.doccrazy.ld29.game.GameWorld;
 import de.doccrazy.ld29.game.actor.DiggerActor;
 import de.doccrazy.ld29.game.actor.Tool;
 import de.doccrazy.ld29.game.base.RegularAction;
+import de.doccrazy.ld29.game.world.GameWorld;
 
 public class DigDownAction extends RegularAction {
     private GameWorld world;

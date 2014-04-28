@@ -18,12 +18,13 @@ import de.doccrazy.ld29.core.Resource;
 import de.doccrazy.ld29.game.base.ActorListener;
 import de.doccrazy.ld29.game.base.Box2dActor;
 import de.doccrazy.ld29.game.level.Category;
+import de.doccrazy.ld29.game.world.GameRules;
+import de.doccrazy.ld29.game.world.GameWorld;
 
 public class GameRenderer implements ActorListener {
     // here we set up the actual viewport size of the game in meters.
-    public static float UNIT_WIDTH = 40f;
+    public static float UNIT_WIDTH = GameRules.LEVEL_WIDTH;
     public static float UNIT_HEIGHT = UNIT_WIDTH*9f/16f;
-	private static final Vector2 CAMERA_WINDOW = new Vector2(3, 2);
 	private static final float CAM_PPS = 5f;
 
     private SpriteBatch batch = new SpriteBatch();
@@ -31,7 +32,6 @@ public class GameRenderer implements ActorListener {
     private GameWorld world;
     private OrthographicCamera camera;
     private Box2DDebugRenderer renderer;
-    private Vector2 playerPos, cameraPos = new Vector2(-100, 100);
 	private float zoom = 1;
 	private float zoomDelta = 0;
 	private float camY;
@@ -39,8 +39,7 @@ public class GameRenderer implements ActorListener {
 
     public GameRenderer(GameWorld world) {
         this.world = world;
-        UNIT_WIDTH = GameWorld.LEVEL_WIDTH;
-        UNIT_HEIGHT = UNIT_WIDTH*9f/16f;
+        // set the game stage viewport to the meters size
         world.stage.setViewport(new ExtendViewport(UNIT_WIDTH, UNIT_HEIGHT));
         renderer = new Box2DDebugRenderer();
 
@@ -72,7 +71,7 @@ public class GameRenderer implements ActorListener {
 
         // box2d debug renderering (optional)
         if (Debug.ON) {
-            //renderer.render(world.box2dWorld, camera.combined);
+            renderer.render(world.box2dWorld, camera.combined);
         }
 
         world.rayHandler.setCombinedMatrix(camera.combined);
@@ -84,21 +83,13 @@ public class GameRenderer implements ActorListener {
 		ExtendViewport vp = (ExtendViewport)world.stage.getViewport();
 		vp.setMinWorldWidth(UNIT_WIDTH*zoom);
 		vp.setMinWorldHeight(UNIT_HEIGHT*zoom);
-        world.stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true); // set the game stage viewport to the meters size
+        world.stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
 
-        // have the camera follow bob
-        //if (world.getPlayer() != null) {
-        //	playerPos = new Vector2(world.getPlayer().getX() + 5f, world.getPlayer().getY());
-        //}
-    	//cameraPos.x = clip(cameraPos.x, playerPos.x - CAMERA_WINDOW.x, playerPos.x + CAMERA_WINDOW.x);
-    	//cameraPos.y = clip(cameraPos.y, playerPos.y - CAMERA_WINDOW.y, playerPos.y + CAMERA_WINDOW.y);
-    	//camera.position.x = cameraPos.x;
-    	//camera.position.y = cameraPos.y;
         if (animateCamera) {
             camY -= Gdx.graphics.getDeltaTime() * CAM_PPS;
         }
         camera.position.x = world.stage.getWidth() / 2;
-        camera.position.y = Math.max(camY, -8);
+        camera.position.y = Math.max(camY, UNIT_HEIGHT/2 - GameRules.LEVEL_HEIGHT + 1);
 	}
 
 	@Override

@@ -2,9 +2,9 @@ package de.doccrazy.ld29.game.actor.ai;
 
 import java.awt.Point;
 
-import de.doccrazy.ld29.game.GameWorld;
 import de.doccrazy.ld29.game.base.RegularAction;
 import de.doccrazy.ld29.game.level.TileType;
+import de.doccrazy.ld29.game.world.GameWorld;
 
 public class BuildAction extends RegularAction {
     private GameWorld world;

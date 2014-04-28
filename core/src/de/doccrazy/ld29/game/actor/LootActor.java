@@ -14,10 +14,10 @@ import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 
 import de.doccrazy.ld29.core.Resource;
-import de.doccrazy.ld29.game.GameWorld;
 import de.doccrazy.ld29.game.base.Box2dActor;
 import de.doccrazy.ld29.game.base.CollisionListener;
 import de.doccrazy.ld29.game.level.Category;
+import de.doccrazy.ld29.game.world.GameWorld;
 
 public class LootActor extends Box2dActor implements CollisionListener {
     public static final float RADIUS = 0.1f;
@@ -99,6 +99,10 @@ public class LootActor extends Box2dActor implements CollisionListener {
 
     @Override
     public void endContact(Body other) {
+    }
+
+    @Override
+    public void hit(float force) {
     }
 
     @Override

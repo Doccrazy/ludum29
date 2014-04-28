@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 import de.doccrazy.ld29.game.ui.UiInputListener;
 import de.doccrazy.ld29.game.ui.UiRoot;
+import de.doccrazy.ld29.game.world.GameWorld;
 
 public class GameScreen implements Screen {
     public static int SCREEN_WIDTH = 1280;

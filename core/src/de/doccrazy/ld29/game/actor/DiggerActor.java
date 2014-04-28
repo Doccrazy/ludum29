@@ -23,12 +23,12 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 
 import de.doccrazy.ld29.core.Resource;
-import de.doccrazy.ld29.game.GameWorld;
 import de.doccrazy.ld29.game.base.Box2dActor;
 import de.doccrazy.ld29.game.base.CollisionListener;
 import de.doccrazy.ld29.game.level.Category;
 import de.doccrazy.ld29.game.level.Mask;
 import de.doccrazy.ld29.game.level.TileType;
+import de.doccrazy.ld29.game.world.GameWorld;
 
 public class DiggerActor extends Box2dActor implements CollisionListener {
     public static final float RADIUS = 0.4f;
@@ -126,7 +126,7 @@ public class DiggerActor extends Box2dActor implements CollisionListener {
             for (int i = 0; i < (15f * Math.random() + 5f); i++) {
                 new LootActor(this.world, pos);
             }
-            Resource.die.play();
+            world.diggerDie(this);
         }
         super.die();
     }
@@ -240,6 +240,13 @@ public class DiggerActor extends Box2dActor implements CollisionListener {
         removeFloorContact(other);
     }
 
+    @Override
+    public void hit(float force) {
+        if (force > 400) {
+            kill();
+        }
+    }
+
     public void setMovement(float movement) {
         this.movement = movement;
     }
@@ -289,6 +296,10 @@ public class DiggerActor extends Box2dActor implements CollisionListener {
     }
 
     public TileType requiredMineral() {
+        return requiredMineral(level);
+    }
+
+    public static TileType requiredMineral(int level) {
         switch (level) {
         case 0: return TileType.COAL;
         case 1: return TileType.IRON;

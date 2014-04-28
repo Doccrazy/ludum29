@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -39,6 +40,8 @@ public class Resource {
     public static Sound levelUp;
     public static Sound errorSound;
     public static Sound respawn;
+
+    public static Music intro, game, outro;
 
     private Resource() {
     }
@@ -98,6 +101,13 @@ public class Resource {
         levelUp = Gdx.audio.newSound(Gdx.files.internal("levelUp.wav"));
         errorSound = Gdx.audio.newSound(Gdx.files.internal("error.wav"));
         respawn = Gdx.audio.newSound(Gdx.files.internal("respawn.wav"));
+
+        intro = Gdx.audio.newMusic(Gdx.files.internal("intro.mp3"));
+        intro.setLooping(true);
+        game = Gdx.audio.newMusic(Gdx.files.internal("game.mp3"));
+        game.setLooping(true);
+        outro = Gdx.audio.newMusic(Gdx.files.internal("outro.mp3"));
+        outro.setLooping(true);
     }
 
     private static Sprite colorSprite(Color color, int width, int height) {

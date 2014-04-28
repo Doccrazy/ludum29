@@ -1,4 +1,4 @@
-package de.doccrazy.ld29.game;
+package de.doccrazy.ld29.game.world;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,9 +27,6 @@ public class GameWorld {
     private static float PHYSICS_STEP = 1f/300f;
 
     public static final Vector2 GRAVITY = new Vector2(0, -9.8f);
-    private static final Vector2 SPAWN = new Vector2(-4f, 4.5f);
-
-    public static final int LEVEL_WIDTH = 46;
 
     public final Stage stage; // stage containing game actors (not GUI, but actual game elements)
     public final World box2dWorld; // box2d world
@@ -40,14 +37,19 @@ public class GameWorld {
 
 	private LevelActor currentLevel;
 	private List<DiggerActor> diggers = new ArrayList<>();
+	private List<Integer> deathList = new ArrayList<>();
 	int spawnCounter;
 	float spawnDelay = 2f;
     private boolean respawn;
+    private float levelTimer;
 
     private int diggerLevel;
     private boolean clearLavaUnlock = false;
 
-    private boolean gameStarted;
+    private int score;
+
+    private GameState gameState;
+    private float gameTime;
 
     public GameWorld() {
         box2dWorld = new World(GRAVITY, true);
@@ -68,24 +70,34 @@ public class GameWorld {
 		}
 
 		createWorld();
+		startSpawn();
+		startGame();
     }
 
     private void createWorld() {
-        Level level = new Level(LEVEL_WIDTH + 2, 24);
+        Level level = new Level(GameRules.LEVEL_WIDTH + 2, GameRules.LEVEL_HEIGHT + 1);
         level.random();
         currentLevel = new LevelActor(this, level, -1);
     }
 
     public void startSpawn() {
+        gameState = GameState.SPAWN;
         spawnCounter = 2;
     }
 
     public void startGame() {
-        gameStarted = true;
+        gameState = GameState.GAME;
+        gameTime = GameRules.GAME_TIME;
+        diggerLevel = 0;
+        levelTimer = 0;
+        Resource.game.play();
     }
 
-    public boolean isGameStarted() {
-        return gameStarted;
+    public void stopGame(boolean victory) {
+        spawnCounter = 0;
+        gameState = victory ? GameState.VICTORY : GameState.DEFEAT;
+        Resource.game.stop();
+        Resource.outro.play();
     }
 
     public void spawnDigger(Vector2 pos, Mood initialMood) {
@@ -95,11 +107,17 @@ public class GameWorld {
         diggers.add(digger);
         digger.addAction(new DiggerAI(this));
         spawnCounter--;
-        spawnDelay = 2f;
+        spawnDelay = GameRules.RESPAWN_DELAY;
     }
 
     public void diggerLevelUp() {
+        if (diggerLevel == GameRules.MAX_LEVEL - 1) {
+            Resource.levelUp.play();
+            stopGame(false);
+            return;
+        }
         diggerLevel++;
+        levelTimer = 0;
         for (DiggerActor digger : diggers) {
             digger.setLevel(diggerLevel);
             for (Action a : digger.getActions()) {
@@ -109,6 +127,10 @@ public class GameWorld {
             }
         }
         Resource.levelUp.play();
+    }
+
+    public int getDiggerLevel() {
+        return diggerLevel;
     }
 
     public boolean isClearLavaUnlock() {
@@ -138,8 +160,8 @@ public class GameWorld {
         	        Resource.respawn.play();
         	    }
         	    Vector2 pos = new Vector2((float)Math.random() * 32 + 4, 1);
-        	    if (!gameStarted) {
-        	        pos.x = Math.random() > 0.5 ? -0.5f : LEVEL_WIDTH + 0.5f;
+        	    if (gameState == GameState.SPAWN) {
+        	        pos.x = Math.random() > 0.5 ? -0.5f : GameRules.LEVEL_WIDTH + 0.5f;
         	    }
         	    spawnDigger(pos, mood);
     	    }
@@ -152,6 +174,19 @@ public class GameWorld {
     	        spawnCounter++;
     	    }
     	}
+
+        levelTimer += delta;
+        if (levelTimer > GameRules.SUPPORT_DELAY) {
+            respawn = false;
+            spawnCounter++;
+            levelTimer = 0;
+        }
+        if (gameState == GameState.GAME) {
+            gameTime -= delta;
+            if (gameTime < 0) {
+                stopGame(true);
+            }
+        }
     }
 
     public LevelActor getCurrentLevel() {
@@ -173,4 +208,30 @@ public class GameWorld {
 			actorListener.actorRemoved(actor);
 		}
 	}
+
+    public void diggerDie(DiggerActor digger) {
+        Resource.die.play();
+        deathList.add(digger.getLevel());
+        score += digger.getLevel() * 10;
+    }
+
+    public List<Integer> getDeathList() {
+        return deathList;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public float getGameTime() {
+        return gameTime;
+    }
+
+    public GameState getGameState() {
+        return gameState;
+    }
+
+    public boolean isGameFinished() {
+        return gameState == GameState.VICTORY || gameState == GameState.DEFEAT;
+    }
 }

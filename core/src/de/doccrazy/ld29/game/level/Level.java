@@ -44,7 +44,7 @@ public class Level {
         put(TileType.GOLD, 10);
         put(TileType.DIAMOND, 16);
         put(TileType.WATER, 9999);
-        put(TileType.LAVA, 9999);
+        put(TileType.LAVA, 10);
     }};
     public static final TileType[] ORES = {TileType.COAL, TileType.IRON, TileType.SILVER, TileType.GOLD, TileType.DIAMOND};
 

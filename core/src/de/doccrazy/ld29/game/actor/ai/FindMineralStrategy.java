@@ -8,9 +8,9 @@ import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 
-import de.doccrazy.ld29.game.GameWorld;
 import de.doccrazy.ld29.game.actor.DiggerActor;
 import de.doccrazy.ld29.game.level.TileType;
+import de.doccrazy.ld29.game.world.GameWorld;
 
 public class FindMineralStrategy extends SequenceAction {
     private GameWorld world;
@@ -33,7 +33,7 @@ public class FindMineralStrategy extends SequenceAction {
     @Override
     public boolean act(float delta) {
         super.act(delta);
-        if (target == null) {
+        if (target == null || world.isGameFinished()) {
             return true;
         }
         Action current = getActions().size > 0 ? getActions().get(0) : null;

@@ -3,7 +3,7 @@ package de.doccrazy.ld29.game.actor.ai;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 
-import de.doccrazy.ld29.game.GameWorld;
+import de.doccrazy.ld29.game.world.GameWorld;
 
 public class StraightGoal extends SequenceAction {
     private GameWorld world;

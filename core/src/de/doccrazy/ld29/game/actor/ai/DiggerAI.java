@@ -4,7 +4,8 @@ import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 
-import de.doccrazy.ld29.game.GameWorld;
+import de.doccrazy.ld29.game.world.GameState;
+import de.doccrazy.ld29.game.world.GameWorld;
 
 public class DiggerAI extends Action {
     private GameWorld world;
@@ -15,7 +16,7 @@ public class DiggerAI extends Action {
         this.world = w;
 
         goalSequence = new SequenceAction();
-        if (!world.isGameStarted()) {
+        if (world.getGameState() == GameState.SPAWN) {
             goalSequence.addAction(new InitialWalkAction());
         }
     }
@@ -24,15 +25,20 @@ public class DiggerAI extends Action {
     public void setActor(Actor actor) {
         super.setActor(actor);
 
-        getActor().addAction(goalSequence);
+        if (actor != null) {
+            getActor().addAction(goalSequence);
+        }
     }
 
     @Override
     public boolean act(float delta) {
-        if (world.isGameStarted() && goalSequence.getActor() == null) {
+        if (world.getGameState() == GameState.GAME && goalSequence.getActor() == null) {
             goalSequence.reset();
             goalSequence.addAction(new FindMineralStrategy(world));
             getActor().addAction(goalSequence);
+        }
+        if (world.isGameFinished()) {
+            return true;
         }
         return false;
     }

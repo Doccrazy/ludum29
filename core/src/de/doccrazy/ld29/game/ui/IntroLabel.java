@@ -9,15 +9,16 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.Align;
 
 import de.doccrazy.ld29.core.Resource;
+import de.doccrazy.ld29.game.world.GameState;
 
 public class IntroLabel extends Label {
     private Typewriter typewriter = new Typewriter();
     private static final String[] TEXT = {
         "Countless hours you sat wondering,\nafter digging your way down\n straight into a pit of lava,\n\nwhat evil mind could have devised \nthe position of the block \nthat became your doom?",
         "Well, wonder no more, \nfor the time of payback has come",
-        "Let the Hate flow through you!"
+        "Do not let them near the diamonds!\nLet the Hate flow through you!"
     };
-    private static final float[] TIMING = {12f, 4.5f, 4.5f};
+    private static final float[] TIMING = {12f, 4.5f, 5f};
     private int line = 0;
     private Label titleLabel;
     private UiRoot root;
@@ -37,9 +38,10 @@ public class IntroLabel extends Label {
     protected void setStage(Stage stage) {
         super.setStage(stage);
         if (stage != null) {
+            Resource.intro.play();
             stage.addActor(titleLabel);
+            root.getWorld().startSpawn();
         }
-        root.getWorld().startSpawn();
     }
 
     @Override
@@ -57,13 +59,21 @@ public class IntroLabel extends Label {
             root.getRenderer().animateCamera();
             typewriter.getAppender().setAppendices(new CharSequence[] {"", "", "", ""});
         } else if (line == 2 && typewriter.getTime() > TIMING[line]) {
-            remove();  // root.getRenderer().animateCamera();  //TODO
-            titleLabel.remove();
-            root.showToolbar();
-            root.getInput().setEnabled(true);
+            introDone();
             root.getWorld().startGame();
         }
         setText(txt);
+
+        if (root.getWorld().getGameState() == GameState.GAME) {
+            root.getRenderer().animateCamera();
+            introDone();
+        }
+    }
+
+    private void introDone() {
+        remove();
+        titleLabel.remove();
+        Resource.intro.stop();
     }
 
     private void setLine(int line) {
