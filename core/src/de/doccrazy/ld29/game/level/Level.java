@@ -107,7 +107,7 @@ public class Level {
                 put(new Point(x, y), pick(x, y));
             }
         }
-        int size = 10;
+        int size = 8;
         for (TileType type : ORES) {
             for (int i = 0; i < 2; i++) {
                 placeOre(type, size);
@@ -120,7 +120,7 @@ public class Level {
         Point pos = null;
         while (pos == null || ArrayUtils.contains(ORES, tileAt(pos))) {
             int y = (int) (MIN_DEPTH.get(type) + Math.random() * (MAX_DEPTH.get(type) - MIN_DEPTH.get(type)));
-            pos = new Point((int) (Math.random() * width), y);
+            pos = new Point(RandomUtils.nextInt(1, width-1), y);
         }
         put(pos, type);
         extend(pos, size, -1);
@@ -129,9 +129,9 @@ public class Level {
     private void extend(Point pos, int size, int nope) {
         TileType type = tileAt(pos);
         Point n = pos;
-        int tries = 10;
+        int tries = 20;
         int r = -1;
-        while (tileAt(n) == type) {
+        while (tileAt(n) == type || isLevelBorder(n.x, n.y)) {
             r = RandomUtils.nextInt(0, 3);
             if (r == nope) {
                 continue;
@@ -173,7 +173,7 @@ public class Level {
             result = type == TileType.GRASS ? 1 : 0;
             return result;
         }
-        if (x == 0 || x == width - 1 || y == -height + 1) {
+        if (isLevelBorder(x, y)) {
             result = type == TileType.OBSIDIAN ? 1 : 0;
             return result;
         }
@@ -200,6 +200,10 @@ public class Level {
             result = result * 5f;
         }
         return result;
+    }
+    
+    private boolean isLevelBorder(int x, int y) {
+    	return x == 0 || x == width - 1 || y == -height + 1;
     }
 
 }
