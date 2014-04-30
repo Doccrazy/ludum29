@@ -12,10 +12,12 @@ import de.doccrazy.ld29.game.world.GameWorld;
 public class DigDownAction extends RegularAction {
     private GameWorld world;
     private boolean done;
+	private boolean before;
 
-    public DigDownAction(GameWorld world) {
+    public DigDownAction(GameWorld world, boolean before) {
         super(1f);
         this.world = world;
+		this.before = before;
     }
 
     @Override
@@ -40,7 +42,9 @@ public class DigDownAction extends RegularAction {
 
     @Override
     protected boolean run(float delta) {
-        Point pos = world.getCurrentLevel().getTileIndex(getActor().getX() + 0.5f, getActor().getY() - 0.5f);
+    	float orientation = ((DiggerActor)getActor()).getOrientation();
+        Point pos = world.getCurrentLevel().getTileIndex(getActor().getX() + 0.5f 
+        		+ (before ? orientation: 0), getActor().getY() - 0.5f);
         if (done || world.getCurrentLevel().getLevel().tileAt(pos) == null) {
             return true;
         }

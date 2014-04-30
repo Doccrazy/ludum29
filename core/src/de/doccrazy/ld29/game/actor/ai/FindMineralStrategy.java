@@ -79,6 +79,9 @@ public class FindMineralStrategy extends SequenceAction {
 
     @Override
     public void restart() {
+    	if (getActor() == null) {
+    		return;
+    	}
         TileType atTarget = world.getCurrentLevel().getLevel().tileAt(target);
         TileType required = ((DiggerActor)getActor()).requiredMineral();
         if (atTarget != required) {

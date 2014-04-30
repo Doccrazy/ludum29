@@ -4,9 +4,14 @@ public class MoveForwardAction extends CenterAction {
     private boolean right;
 
     public MoveForwardAction(boolean right) {
+    	this(right, 1);
+    }
+    
+	public MoveForwardAction(boolean right, float speed) {
         super(null);
         this.right = right;
-        threshold = 0.5;
+        this.speed = speed;
+        threshold = speed/2f;
     }
 
     @Override

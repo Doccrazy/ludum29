@@ -9,6 +9,8 @@ public class CenterAction extends Action {
     private float xTarget;
     protected double threshold = 0.2;
     private Boolean orientRight;
+    protected float speed = 1;
+    private float stateTime = 0;
 
     public CenterAction(Boolean orientRight) {
         this.orientRight = orientRight;
@@ -25,15 +27,20 @@ public class CenterAction extends Action {
 
     @Override
     public boolean act(float delta) {
+    	stateTime += delta;
         if (!((DiggerActor)getActor()).touchingFloor()) {
             return false;
+        }
+        
+        if (stateTime > 2) {
+        	return true;
         }
 
         double dist = xTarget - (getActor().getX() + getActor().getWidth()/2);
         if (dist < -threshold) {
-            ((DiggerActor)getActor()).setMovement(-1);
+            ((DiggerActor)getActor()).setMovement(-speed);
         } else if (dist > threshold) {
-            ((DiggerActor)getActor()).setMovement(1);
+            ((DiggerActor)getActor()).setMovement(speed);
         } else {
             ((DiggerActor)getActor()).setMovement(0);
             if (Boolean.TRUE.equals(orientRight)) {
@@ -53,6 +60,7 @@ public class CenterAction extends Action {
     @Override
     public void restart() {
         super.restart();
+        stateTime = 0;
         if (actor != null) {
             xTarget = getTargetPos();
         }
