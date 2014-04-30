@@ -93,6 +93,7 @@ public class GameWorld {
         gameTime = GameRules.GAME_TIME;
         diggerLevel = 0;
         levelTimer = 0;
+        Resource.outro.stop();
         Resource.game.play();
     }
 
@@ -154,7 +155,7 @@ public class GameWorld {
     		deltaCache -= PHYSICS_STEP;
     	}
 
-    	if (spawnCounter > 0) {
+    	if (spawnCounter > 0 && (gameState == GameState.SPAWN || gameState == GameState.GAME)) {
     	    spawnDelay -= delta;
     	    if (spawnDelay < 0) {
         	    Mood mood = Math.random() > 0.5 ? Mood.DIAMOND : Mood.MONEY;
