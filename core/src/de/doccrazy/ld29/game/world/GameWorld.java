@@ -221,7 +221,7 @@ public class GameWorld {
     public void diggerDie(DiggerActor digger) {
         Resource.die.play();
         deathList.add(digger.getLevel());
-        score += digger.getLevel() * 10;
+        score += (digger.getLevel() + 1) * 10;
     }
 
     public List<Integer> getDeathList() {
