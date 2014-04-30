@@ -88,7 +88,7 @@ public class GameRenderer implements ActorListener {
         if (animateCamera) {
             camY -= Gdx.graphics.getDeltaTime() * CAM_PPS;
         }
-        camera.position.x = world.stage.getWidth() / 2;
+        camera.position.x = GameRules.LEVEL_WIDTH / 2;
         camera.position.y = Math.max(camY, UNIT_HEIGHT/2 - GameRules.LEVEL_HEIGHT + 1);
 	}
 

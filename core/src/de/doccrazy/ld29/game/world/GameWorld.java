@@ -1,9 +1,12 @@
 package de.doccrazy.ld29.game.world;
 
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+
+import org.apache.commons.lang3.RandomUtils;
 
 import box2dLight.RayHandler;
 
@@ -159,11 +162,17 @@ public class GameWorld {
         	        mood = Math.random() > 0.5 ? Mood.ANGRY : Mood.PISSED;
         	        Resource.respawn.play();
         	    }
-        	    Vector2 pos = new Vector2((float)Math.random() * 32 + 4, 1);
+        	    Point pos = new Point(RandomUtils.nextInt(3, GameRules.LEVEL_WIDTH-2), 1);
         	    if (gameState == GameState.SPAWN) {
-        	        pos.x = Math.random() > 0.5 ? -0.5f : GameRules.LEVEL_WIDTH + 0.5f;
+        	        pos.x = Math.random() > 0.5 ? -1 : GameRules.LEVEL_WIDTH + 1;
+        	    } else {
+        	    	int tries = 0;
+        	    	while (currentLevel.getLevel().tileAt(pos.x, 0) == null && tries < 15) {
+        	    		pos.x = RandomUtils.nextInt(3, GameRules.LEVEL_WIDTH-2);
+        	    		tries++;
+        	    	}
         	    }
-        	    spawnDigger(pos, mood);
+        	    spawnDigger(currentLevel.tileToWorld(pos), mood);
     	    }
     	}
     	for (Iterator<DiggerActor> it = diggers.iterator(); it.hasNext(); ) {
